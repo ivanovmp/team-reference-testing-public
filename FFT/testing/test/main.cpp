@@ -123,7 +123,7 @@ void NTTFastCheck(const int bits) {
         ASSERT_NE(ans[0], -1);
     }
     ld_nano actual_time = sample_time(times);
-    cerr << "bits == " << bits << ": n lon n coefficient == " << actual_time / (bits << bits) / 1us << " us\n";
+    cerr << "bits == " << bits << ": n log n coefficient == " << actual_time / (bits << bits) << '\n';
 
     cerr << "NNT multiplication for " << bits <<
          " bits (overall " << T << " tries) " <<
