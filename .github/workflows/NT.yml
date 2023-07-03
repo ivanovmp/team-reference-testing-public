@@ -1,0 +1,21 @@
+name: Number Theory CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  gtest:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: cmake
+      run: cd ./number_theory/testing/test/ && cmake .
+    - name: gtest-make
+      run: cd ./number_theory/testing/test && make
+    - name: gtest
+      run: cd ./number_theory/testing/test && ./TestTeamReferenceNT
