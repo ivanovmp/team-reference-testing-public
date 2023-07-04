@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <thread>
 
 #include "../../../utils/testing.hpp"
 #include "../../../number_theory/NT.hpp"
@@ -18,7 +19,7 @@ TEST(NTT, CorrectPowersTest) {
 }
 
 void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
-    const int TRIES = 6;
+    const int TRIES = 60;
     const int steps = 32 - __builtin_clz(max<int>(1, a.size()) + max<int>(1, b.size()) - 2);
     vi fast_ans = ntt.prod(a, b, steps);
     vi indices;
@@ -32,11 +33,16 @@ void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
         indices.push_back(index);
     for (int index : choose_n_numbers(sz, (1 << steps) - 1, min((1 << steps) - sz, TRIES)))
         indices.push_back(index);
-    for (int index : indices) {
-        int correct_ans = FFT::NaiveNTT::prod_nth(a, b, index);
-        int f_ans = index < fast_ans.size() ? fast_ans[index] : 0;
-        ASSERT_EQ(correct_ans, f_ans) << "a.size() == " << a.size() << ", b.size() == " << b.size() << ", index == " << index;
-    }
+    vector<thread> threads;
+    auto check = [&](const int i) {
+        int correct_ans = FFT::NaiveNTT::prod_nth(a, b, i);
+        int f_ans = i < fast_ans.size() ? fast_ans[i] : 0;
+        ASSERT_EQ(correct_ans, f_ans) << "a.size() == " << a.size() << ", b.size() == " << b.size() << ", index == " << i;
+    };
+    for (int index : indices)
+        threads.emplace_back(check, index);
+    for (thread& th : threads)
+        th.join();
 //    cerr << "Prod of " << a.size() << " and " << b.size() << " is correct on these indices:";
 //    for (int i : indices)
 //        cerr << ' ' << i;
