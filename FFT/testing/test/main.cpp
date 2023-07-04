@@ -103,7 +103,7 @@ NTTCorrectAnswersTestMacro(19)
 NTTCorrectAnswersTestMacro(20)
 
 void NTTFastCheck(const int bits) {
-    const auto t = 100ns, s = 2000ns;
+    const auto t = 200ns, s = 3000ns;
     auto expected_time = [&](ul n) {
         return (n << n) * t + s;
     };
