@@ -20,7 +20,7 @@ TEST(NTT, CorrectPowersTest) {
 void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
     const int TRIES = 6;
     const int steps = 32 - __builtin_clz(max<int>(1, a.size()) + max<int>(1, b.size()) - 2);
-    vi fast_ans = ntt.multiply(a, b, steps);
+    vi fast_ans = ntt.prod(a, b, steps);
     vi indices;
     indices.push_back(0);
     indices.push_back(1);
@@ -33,7 +33,7 @@ void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
     for (int index : choose_n_numbers(sz, (1 << steps) - 1, min((1 << steps) - sz, TRIES)))
         indices.push_back(index);
     for (int index : indices) {
-        int correct_ans = FFT::NaiveNTT::multiply_nth(a, b, index);
+        int correct_ans = FFT::NaiveNTT::prod_nth(a, b, index);
         int f_ans = index < fast_ans.size() ? fast_ans[index] : 0;
         ASSERT_EQ(correct_ans, f_ans) << "a.size() == " << a.size() << ", b.size() == " << b.size() << ", index == " << index;
     }
@@ -103,7 +103,7 @@ NTTCorrectAnswersTestMacro(19)
 NTTCorrectAnswersTestMacro(20)
 
 void NTTFastCheck(const int bits) {
-    const auto t = 200ns, s = 1400ns;
+    const auto t = 100ns, s = 2000ns;
     auto expected_time = [&](ul n) {
         return (n << n) * t + s;
     };
@@ -117,7 +117,7 @@ void NTTFastCheck(const int bits) {
     vector<ld_nano> times;
     for (const auto& dataset : datasets) {
         auto start_time = chrono::high_resolution_clock::now();
-        auto ans = ntt.multiply(dataset.first, dataset.second, bits + 1);
+        auto ans = ntt.prod(dataset.first, dataset.second, bits + 1);
         auto end_time = chrono::high_resolution_clock::now();
         times.emplace_back(end_time - start_time);
         ASSERT_NE(ans[0], -1);

@@ -34,6 +34,10 @@ namespace NT {
 	int prod(int a, int b, int m) {
 		return (ul)a * b % m;
 	}
+    int inv(int a, int m) {
+        if (a == 1) return 1;
+        return (1 - ll(inv(m % a, a)) * m) / a + m;
+    }
     ul sum(ul a, ul b, ul m) {
         a += b; if (a >= m || a < b) a -= m;
         return a;

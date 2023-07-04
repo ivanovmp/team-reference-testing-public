@@ -62,7 +62,7 @@ namespace FFT
  		 	for (int i = 0; i < (1 << step); i++) poly[i] = poly[i] / (1 << step);
  		}
 
- 		vector <db> multiply(const vector <db> &A, const vector <db> &B, int step)
+ 		vector <db> prod(const vector <db> &A, const vector <db> &B, int step)
  		{
  		 	fill(fftA.begin(), fftA.begin() + (1 << step), 0);
  		 	fill(fftB.begin(), fftB.begin() + (1 << step), 0);
