@@ -278,7 +278,9 @@ ExpLogTestMacro(17)
 ExpLogTestMacro(18)
 ExpLogTestMacro(19)
 
-
+/*
+ * This is an incorrect test. There is some "Euler transform" used here which is not implemented.
+ *
 // see https://oeis.org/A000088 and https://oeis.org/A001349
 TEST(FPS, A000088_A001349) {
     const vi A000088 = {1, 1, 2, 4, 11, 34, 156, 1044, 12346, 274668, 12005168, 20753511, 380854347, 849549682, 209104826, 721826955, 509875705, 766808107, 374514196, 553750285};
@@ -288,6 +290,7 @@ TEST(FPS, A000088_A001349) {
     ASSERT_EQ(A000088, A000088_expected);
     ASSERT_EQ(A001349, A001349_expected);
 }
+*/
 
 // see https://oeis.org/A006125 and https://oeis.org/A001187
 TEST(FPS, A006125_A001187) {

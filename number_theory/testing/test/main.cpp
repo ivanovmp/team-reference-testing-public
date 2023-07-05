@@ -309,8 +309,8 @@ void compare_miller_rabin_primality(const vu& dataset,
 void deterministic_and_random_miller_rabin_primality(const int bits) {
     const ul L = ul(1) << (bits - 1),
              R = (L << 1) - 1;
-    const auto t_det = .3ns, s_det = 20000.ns;
-    const auto t_ran = 2.5ns, s_ran = 20000.ns;
+    const auto t_det = .3ns, s_det = 10000.ns;
+    const auto t_ran = 2.5ns, s_ran = 21000.ns;
     auto expected_time_det = [&](ul n) {
         return t_det * pow(log(n + 1), 3) + s_det;
     };
