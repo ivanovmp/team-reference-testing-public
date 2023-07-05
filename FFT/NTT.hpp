@@ -5,7 +5,7 @@ namespace FFT {
     public:
         const int n = 20;
         const int size = (1 << n);
-        const int MOD = 998244353, g = 3;
+        const int MOD = 998244353, G = 3;
         const int ROOT = 565042129;
 
         NTT() : revers(size), root(size),
@@ -42,11 +42,13 @@ namespace FFT {
             for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
         }
 
-        vector<int> prod(const vector<int> &A, const vector<int> &B, int step) {
+        template<class Iter>
+        vector<int> multiply(Iter Ab, Iter Ae, Iter Bb, Iter Be, int step) {
+            if (Ab == Ae || Bb == Be) return {};
             fill(fftA.begin(), fftA.begin() + (1 << step), 0);
             fill(fftB.begin(), fftB.begin() + (1 << step), 0);
-            for (int i = 0; i < (int) A.size(); i++) fftA[i] = A[i] % MOD;
-            for (int i = 0; i < (int) B.size(); i++) fftB[i] = B[i] % MOD;
+            for (auto it = Ab; it != Ae; ++it) fftA[it - Ab] = *it % MOD;
+            for (auto it = Bb; it != Be; ++it) fftB[it - Bb] = *it % MOD;
 
             fft(fftA, step);
             fft(fftB, step);
@@ -58,37 +60,52 @@ namespace FFT {
             return result;
         }
 
-        vi add(const vi& A, const vi& B) {
+        vector<int> multiply(const vector<int> &A, const vector<int> &B, int step) {
+            return multiply(A.begin(), A.end(), B.begin(), B.end(), step);
+        }
+
+        // returns a vector of size exactly n
+        vi prod(const vi &A, const vi &B, const int n) {
+            int as = min<int>(A.size(), n), bs = min<int>(B.size(), n);
+            vi ans = multiply(A.begin(), A.begin() + as, B.begin(), B.begin() + bs, 32 - __builtin_clz(as + bs - 2));
+            ans.resize(n);
+            return ans;
+        }
+
+        vi prod(const vi &A, const vi &B) {
+            if (A.empty() || B.empty()) return {};
+            return prod(A, B, A.size() + B.size() - 1);
+        }
+
+        vi sum(const vi &A, const vi &B) const {
             vi ans(max(A.size(), B.size()));
             for (int i = 0; i < ans.size(); ++i)
                 if (i >= A.size()) ans[i] = B[i];
                 else if (i >= B.size()) ans[i] = A[i];
                 else ans[i] = NT::sum(A[i], B[i], MOD);
+            return ans;
         }
 
-        vi dif(const vi& A, const vi& B) {
+        vi dif(const vi &A, const vi &B) const {
             vi ans(max(A.size(), B.size()));
             for (int i = 0; i < ans.size(); ++i)
                 if (i >= A.size()) ans[i] = NT::dif(0, B[i], MOD);
                 else if (i >= B.size()) ans[i] = A[i];
                 else ans[i] = NT::dif(A[i], B[i], MOD);
+            return ans;
         }
 
         vi inverse(const vi &A, const int n) {
             vi a(1, A[0]);
             vi b(1, NT::inv(A[0], MOD));
             for (int bits = 1; b.size() < n; ++bits) {
-                b.resize(1 << (bits - 1));
-                for (int i = b.size(); i < min<int>(1 << bits, A.size()); ++i)
-                    a.push_back(A[i]);
-                vi ab = prod(a, b, bits + 1); ab.resize(1 << bits);
-                b = prod(b, dif(vi(1, 2), ab), bits + 1);
+                copy(A.begin() + min<int>(A.size(), b.size()), A.begin() + min<int>(1 << bits, A.size()), back_inserter(a));
+                b = prod(b, dif(vi(1, 2), prod(a, b, 1 << bits)), min(n, 1 << bits));
             }
-            b.resize(n);
             return b;
         }
 
-        vi derivative(const vi &A) {
+        vi derivative(const vi &A) const {
             if (A.size() <= 1) return {};
             vi B(A.size() - 1);
             for (int i = 1; i < A.size(); ++i)
@@ -96,14 +113,14 @@ namespace FFT {
             return B;
         }
 
-        vi factorials(const int n) {
+        vi factorials(const int n) const {
             vi fact(n, 1);
             for (int i = 2; i < n; ++i)
                 fact[i] = NT::prod(i, fact[i - 1], MOD);
             return fact;
         }
 
-        vi inverses(const int n) {
+        vi inverses(const int n) const {
             vi fact = factorials(n);
             int ifact = NT::inv(fact.back(), MOD);
             for (int i = n - 1; i >= 2; --i) {
@@ -113,12 +130,96 @@ namespace FFT {
             return fact;
         }
 
-        vi integral(const vi &A) {
+        // ans[0] == 0
+        vi integral(const vi &A) const {
             vi B(A.size() + 1);
             vi invs = inverses(B.size());
             for (int i = 1; i <= A.size(); ++i)
                 B[i] = NT::prod(A[i - 1], invs[i], MOD);
             return B;
+        }
+
+        // A[0] == 1, ans[0] = 0
+        vi logarithm(vi A, const int n) {
+            A.resize(min<int>(A.size(), n));
+            A = prod(derivative(A), inverse(A, n - 1), n - 1);
+            return integral(A);
+        }
+
+        // A[0] == 0, ans[0] == 1
+        vi exponent(const vi &A, const int n) {
+            vi a(1);
+            vi b(1, 1);
+            for (int bits = 1; b.size() < n; ++bits) {
+                vi ln_b = logarithm(b, min(1 << bits, n));
+                copy(A.begin() + b.size(), A.begin() + min<int>(1 << bits, A.size()), back_inserter(a));
+                ln_b = dif(a, ln_b);
+                ln_b[0] = NT::sum(ln_b[0], 1, MOD);
+                b = prod(b, ln_b, min(1 << bits, n));
+            }
+            return b;
+        }
+
+        // A[0] == 1, ans[0] == 1, alpha is rational
+        vi power(vi A, const int alpha, const int n) {
+            A = logarithm(A, n);
+            for (int &a: A)
+                a = NT::prod(a, alpha, MOD);
+            A = exponent(A, n);
+            return A;
+        }
+
+        const int imaginary_unit = 911660635;
+        // A[0] == 0, ans[0] == 0
+        vi sin(const vi &A, const int n) {
+            static int MINUS_I_HALF = NT::prod(imaginary_unit, (MOD - 1) / 2, MOD);
+            vi a = A; a.resize(min<int>(n, A.size()));
+            for (int &i: a) i = NT::prod(i, imaginary_unit, MOD);
+            vi exp_1 = exponent(a, n);
+            for (int &i : a) i = NT::dif(0, i, MOD);
+            vi exp_2 = exponent(a, n);
+            exp_1 = dif(exp_1, exp_2);
+            for (int &i : exp_1) i = NT::prod(i, MINUS_I_HALF, MOD);
+            return exp_1;
+        }
+
+        // A[0] == 0, ans[0] == 1
+        vi cos(const vi &A, const int n) {
+            static int HALF = (MOD + 1) / 2;
+            vi a = A; a.resize(min<int>(n, A.size()));
+            for (int &i: a) i = NT::prod(i, imaginary_unit, MOD);
+            vi exp_1 = exponent(a, n);
+            for (int &i : a) i = NT::dif(0, i, MOD);
+            vi exp_2 = exponent(a, n);
+            exp_1 = sum(exp_1, exp_2);
+            for (int &i : exp_1) i = NT::prod(i, HALF, MOD);
+            return exp_1;
+        }
+
+        // A[0] == 0, ans[0] == 0
+        vi arcsin(const vi &A, const int n) {
+            static int MINUS_HALF = (MOD - 1) / 2;
+            return integral(prod(derivative(A), power(dif(vi(1, 1), prod(A, A, n - 1)), MINUS_HALF, n - 1), n - 1));
+        }
+
+        vi EGF(vi ogf) {
+            int ifact = 1, n = ogf.size();
+            for (int i = 2; i < n; ++i) ifact = NT::prod(ifact, i, MOD);
+            ifact = NT::inv(ifact, MOD);
+            for (int i = n - 1; i >= 2; --i) {
+                ogf[i] = NT::prod(ogf[i], ifact, MOD);
+                ifact = NT::prod(ifact, i, MOD);
+            }
+            return ogf;
+        }
+
+        vi OGF(vi egf) {
+            int fact = 1, n = egf.size();
+            for (int i = 2; i < n; ++i) {
+                fact = NT::prod(fact, i, MOD);
+                egf[i] = NT::prod(egf[i], fact, MOD);
+            }
+            return egf;
         }
 
     private:

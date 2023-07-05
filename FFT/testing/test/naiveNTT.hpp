@@ -16,5 +16,22 @@ namespace FFT {
                 ans[i] = prod_nth(A, B, i);
             return ans;
         }
+        static vi logarithm(vi A, const int n) {
+            A[0] = 0;
+            A.resize(n);
+            vi ans = A;
+            vi pw = A;
+            for (int i = 2; i < n; ++i) {
+                pw = prod(pw, A);
+                pw.resize(n);
+                int coef = NT::inv(i, MOD);
+                if (i % 2 == 0)
+                    coef = NT::dif(0, coef, MOD);
+                for (int i = 0; i < n; ++i) {
+                    ans[i] = NT::sum(ans[i], NT::prod(pw[i], coef, MOD), MOD);
+                }
+            }
+            return ans;
+        }
     };
 }
