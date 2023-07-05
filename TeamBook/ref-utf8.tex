@@ -495,19 +495,16 @@ struct Bitset {
 \begin{verbatim}
 namespace FFT {
     using db = double;
-
     class FFT //NTT {
     //double vs long double!!!
     public:
         const db PI = 4 * atan2(1, 1);
-
         /*
         const int n = 20;
         const int size = (1 << n);
         const int MOD = 998244353; //g = 3
         const int ROOT = 565042129;
        */
-        
         FFT(int _n) : size(1 << _n), n(_n) { //NTT()
             revers.resize(size), root.resize(size);
             fftA.resize(size), fftB.resize(size);
@@ -521,7 +518,6 @@ namespace FFT {
                 root[i] = (ll) root[i - 1] * ROOT % MOD;
             */
         }
-
         void fft(vector <Complex> &poly, int newN) { //Complex -> int
             revers[0] = 0;
             for (int i = 1; i < (1 << newN); i++) {
@@ -529,7 +525,6 @@ namespace FFT {
                 else revers[i] = revers[i / 2] / 2 + (1 << (newN - 1));
                 if (revers[i] < i) swap(poly[revers[i]], poly[i]);
             }
-
             for (int level = 1; level <= newN; level++)
                 for (int block = 0; block < (1 << (newN - level)); block++)
                     for (int step = 0; step < (1 << (level - 1)); step++) {
@@ -541,29 +536,24 @@ namespace FFT {
                         poly[num2] = valA - valB; // % MOD
                     }
         }
-
         void rev_fft(vector <Complex> &poly, int step) { //Complex -> int
             fft(poly, step);
             reverse(poly.begin() + 1, poly.begin() + (1 << step));
             for (int i = 0; i < (1 << step); i++) poly[i] = poly[i] / (1 << step);
-
             /*
             int inv_size = binpow((1 << step), MOD - 2);
             for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
             */
         }
-
         vector <db> multiply(const vector <db> &A, const vector <db> &B, int step) { //db -> int
             fill(fftA.begin(), fftA.begin() + (1 << step), 0);
             fill(fftB.begin(), fftB.begin() + (1 << step), 0);
             for (int i = 0; i < (int) A.size(); i++) fftA[i] = A[i]; // % MOD
             for (int i = 0; i < (int) B.size(); i++) fftB[i] = B[i]; // % MOD
-            
             fft(fftA, step);
             fft(fftB, step);
             for (int i = 0; i < (1 << step); i++) fftA[i] = fftA[i] * fftB[i]; // (ll), % MOD
             rev_fft(fftA, step);
-
             vector <db> result(1 << step); //db -> int
             for (int i = 0; i < (1 << step); i++) result[i] = fftA[i].real; // = fftA[i]
             return result;
@@ -573,7 +563,6 @@ namespace FFT {
         vector <Complex> root;
         vector <int> revers;
         vector <Complex> fftA, fftB;
-
         //vector <int> root, revers, fftA, fftB;
     };
 }
@@ -585,19 +574,16 @@ namespace FFT {
 namespace Convolution {
     class Convolution {
         using Int = int;
-
     public:
         Convolution(int _n) : n(_n), size(1 << _n) {
             helpA.resize(size), helpB.resize(size);
         }
-
         // OR  -- (1  0), REV -- ( 1 0)
         //        (1  1)         (-1 1)
         // AND -- (1  1), REV -- (1 -1)
         //        (0  1)         (0  1)
         // XOR -- (1  1), REV -- (1  1), /= size
         //        (1 -1)         (1 -1)
-
         vector <Int> convolution(const vector <Int> &A, const vector <Int> &B) {
             for (int i = 0; i < size; i++) helpA[i] = A[i];
             for (int i = 0; i < size; i++) helpB[i] = B[i];
@@ -607,7 +593,6 @@ namespace Convolution {
             rev_transform(helpA);
             return helpA;
         }
-
     private:
         vector <Int> helpA, helpB;
         int n, size;
@@ -622,9 +607,7 @@ namespace SuffixTree {
 struct Position {
     int vertex, shift; 	
 };
-
 const int ALPHABET = 26;
-
 class SuffixTree {
 public: 	 	
     SuffixTree(const vector <int> &s) {
@@ -632,13 +615,11 @@ public:
         int n = (int) str.size();
         str_bounds.resize(2 * n, mp(0, 0)), suflink.resize(2 * n, -1), parent.resize(2 * n, mp(-1, -1));
         for (int i = 0; i < ALPHABET; i++) next_step[i].resize(2 * n, -1);
-        
         quant++;
         int root = 0;
         str_bounds[root] = mp(0, -1);
         suflink[root] = root;
         Position cur = {root, 0};
-
         for (int i = 0; i < n; i++) {
             int symb = str[i];
             bool do_move = true;
@@ -654,7 +635,6 @@ public:
             if (do_move) cur = move_next(cur, symb);
         }
     }
-
     bool can_move(Position cur, int symb) const {
         if (cur.shift == 0) return next_step[symb][cur.vertex] != -1;
         else {
@@ -662,12 +642,10 @@ public:
             return next_symb == symb;
         }
     }
-
     Position create_edge(Position cur, int symb, int lef, int rig) {
         if (cur.shift != 0) {
             quant++;
             int mid_vertex = quant - 1;
-            
             parent[mid_vertex] = parent[cur.vertex];
             next_step[parent[mid_vertex].x][parent[mid_vertex].y] = mid_vertex;
             int next_symb = str[str_bounds[cur.vertex].x + cur.shift];
@@ -675,10 +653,8 @@ public:
             next_step[next_symb][mid_vertex] = cur.vertex;
             str_bounds[mid_vertex] = mp(str_bounds[cur.vertex].x, str_bounds[cur.vertex].x + cur.shift - 1);
             str_bounds[cur.vertex] = mp(str_bounds[cur.vertex].x + cur.shift, str_bounds[cur.vertex].y);
-
             cur = {mid_vertex, 0};
-        }
-        
+        }   
         quant++;
         int new_vertex = quant - 1;
         next_step[symb][cur.vertex] = new_vertex;
@@ -686,7 +662,6 @@ public:
         str_bounds[new_vertex] = mp(lef, rig);
         return cur;
     }
-
     Position jump_suflink(Position cur) const {
         int lef = 0, rig = 0;
         if (cur.shift == 0) {
@@ -710,7 +685,6 @@ public:
         }
         return new_cur;
     }
-
     Position move_next(Position cur, int symb) const {
         if (cur.shift == 0) {
             int next_vert = next_step[symb][cur.vertex];
@@ -735,7 +709,6 @@ private:
 \begin{verbatim}
 namespace SuffixAutomaton {
     const int ALPHABET = 26;
-    
     class SuffixAutomaton {
     public:
         SuffixAutomaton(const vector <int> &s) {
@@ -743,10 +716,8 @@ namespace SuffixAutomaton {
             int max_states = max(2 * n - 1, 5);
             len.resize(max_states, 0), suflink.resize(max_states, -1);
             for (int i = 0; i < ALPHABET; i++) next_step[i].resize(max_states, -1);
-
             int root = 0; 
             quant++;
-
             int cur = root;
             for (int x : s) cur = add_symbol(cur, x);	
             last_vert = cur;
@@ -755,24 +726,20 @@ namespace SuffixAutomaton {
             quant++;
             int cur = quant - 1;
             len[cur] = len[last] + 1;
-
             int p = last;
             while (p != -1 && next_step[c][p] == -1) {
                 next_step[c][p] = cur;
                 p = suflink[p];
             }
-
             if (p == -1) {
                 suflink[cur] = 0;
                 return cur; 	
             }
-
             int q = next_step[c][p];
             if (len[q] == len[p] + 1) {
                 suflink[cur] = q;
                 return cur;
             }
-
             quant++;
             int clone = quant - 1;
             len[clone] = len[p] + 1;
@@ -794,87 +761,98 @@ namespace SuffixAutomaton {
 }
 \end{verbatim}
 
-\subsection{Сумма линейных функций по модулю}
-\begin{verbatim}
-// sum(i=0..n-1) (a + b * i) div m
-ll solve(ll n, ll a, ll b, ll m) {
-    if (b == 0) return n * (a / m);
-    if (a >= m) return n * (a / m) + solve(n, a % m, b, m);
-    if (b >= m) return n * (n - 1) / 2 * (b / m) + solve(n, a, b % m, m);
-    return solve((a + b * n) / m, (a + b * n) % m, m, b);
-}
-\end{verbatim}
-
-\subsection{Диниц}
+\subsection{Два китайца}
 
 \begin{verbatim}
-const int MAXN = ...;
-const int INF = 1e9 + 9;
-
-struct edge {
-    int a, b, cap, flow;
-};
-
-int n, s, t, d[MAXN], ptr[MAXN], q[MAXN];
-vector<edge> e;
-vector<int> g[MAXN];
-
-void add_edge (int a, int b, int cap) {
-    edge e1 = { a, b, cap, 0 };
-    edge e2 = { b, a, 0, 0 };
-    g[a].push_back ((int) e.size());
-    e.push_back (e1);
-    g[b].push_back ((int) e.size());
-    e.push_back (e2);
-}
-bool bfs() {
-    int qh=0, qt=0;
-    q[qt++] = s;
-    memset (d, -1, n * sizeof d[0]);
-    d[s] = 0;
-    while (qh < qt && d[t] == -1) {
-        int v = q[qh++];
-        for (size_t i=0; i<g[v].size(); ++i) {
-            int id = g[v][i],
-                to = e[id].b;
-            if (d[to] == -1 && e[id].flow < e[id].cap) {
-                q[qt++] = to;
-                d[to] = d[v] + 1;
+namespace TwoChinese {
+    struct Edge {
+        int from, to, weight;
+    };
+    class TwoChinese {
+    public:
+        TwoChinese(int _n, const vector <Edge> &_edges, int _root) : n(_n), edges(_edges), root(_root) {
+            komp.resize(n), metka.resize(n), in_edges.resize(n);
+            delta.resize(n), parent.resize(n), used.resize(n), finish.resize(n);
+            for (int i = 0; i < n; i++) metka[i] = i, komp[i].pb(i);
+            for (int i = 0; i < (int) edges.size(); i++)
+                in_edges[edges[i].to].insert(mp(edges[i].weight, i));
+            finish[root] = true;
+            for (int vert = 0; vert < n; vert++)
+                if (!finish[vert]) {
+                    path.clear();
+                    build_path(metka[vert], -1);
+                }
+            for (int i = 0; i < n; i++)
+                if (i != root) total += edges[parent[i]].weight;
+        }
+        void build_path(int v, int last) {
+            path.pb(mp(v, last));
+            used[v] = true;
+            while (metka[edges[in_edges[v].begin()->y].from] == v)
+                in_edges[v].erase(in_edges[v].begin());
+            delta[v] = in_edges[v].begin()->x;
+            int num = in_edges[v].begin()->y;
+            int u = metka[edges[num].from];
+            if (finish[u]) {
+                for (const auto &[v0, nm] : path)
+                    for (int u0 : komp[v0])
+                        finish[u0] = true;
+                path.pb(mp(u, num));
+                for (int i = 0; i < (int) path.size() - 1; i++)
+                    parent[path[i].x] = path[i + 1].y;
+                return;	
             }
+            if (!used[u]) {
+                build_path(u, num);
+                return;
+            }
+            vector <pair <int, int> > cycle;
+            int new_vert = u;
+            while (true) {
+                pair <int, int> A = path.back();
+                cycle.pb(A);
+                path.pop_back();
+                if ((int) komp[A.x].size() > (int) komp[new_vert].size()) new_vert = A.x;
+                if (A.x == u) break;
+            }
+            int old = cycle.back().y;
+            cycle.back().y = num;
+            vector <pair <int, int> > otkat;
+            for (const auto &[v0, nm] : cycle) {
+                if (v0 == new_vert) continue;
+                for (int u0 : komp[v0]) {
+                    otkat.pb(mp(u0, metka[u0]));
+                    metka[u0] = new_vert, komp[new_vert].pb(u0);
+                }
+                for (const auto &[w, nums] : in_edges[v0])
+                    in_edges[new_vert].insert(mp(w - delta[v0] + delta[new_vert], nums));
+            }
+            build_path(new_vert, old);
+            int need = parent[new_vert];
+            for (int i = 0; i < (int) cycle.size() - 1; i++)
+                parent[cycle[i + 1].x] = cycle[i].y;
+            parent[cycle[0].x] = cycle.back().y;
+            while (!otkat.empty()) {
+                pair <int, int> A = otkat.back();
+                otkat.pop_back();
+                metka[A.x] = A.y;
+            }
+            parent[metka[edges[need].to]] = need;
         }
-    }
-    return d[t] != -1;
-}
-int dfs (int v, int flow, int can) {
-    if (!flow)  return 0;
-    if (v == t)  return flow;
-    for (; ptr[v]<(int)g[v].size(); ++ptr[v]) {
-        int id = g[v][ptr[v]],
-            to = e[id].b;
-        if (d[to] != d[v] + 1 || e[id].cap - e[id].flow < can)  continue;
-        int pushed = dfs (to, min (flow, e[id].cap - e[id].flow), can);
-        if (pushed) {
-            e[id].flow += pushed;
-            e[id^1].flow -= pushed;
-            return pushed;
-        }
-    }
-    return 0;
-}
-int dinic() {
-    int flow = 0;
-    for (;;) {
-        if (!bfs())  break;
-        memset (ptr, 0, n * sizeof ptr[0]);
-        for (int k = 30; k >= 0; k--) // just k = 0, if no scaling {
-            while (int pushed = dfs(s, INF, (1 << k)))
-                flow += pushed;
-        }
-    }
-    return flow;
+    private:
+        int n;
+        vector <Edge> edges;
+        int root;
+        ll total = 0;
+        vector <int> parent, metka;
+        vector <vector <int> > komp;
+        vector <ll> delta;
+        vector <set <pair <ll, int> > > in_edges;
+        vector <bool> finish, used;
+        vector <pair <int, int> > path;
+    };
 }
 \end{verbatim}
-
 
 \subsection{Dynamic CHT}
 \begin{verbatim}
@@ -913,85 +891,84 @@ struct LineContainer : multiset<Line, less<>> {
         return l.k * x + l.m;
     }
 };
-
 \end{verbatim}
 
 \subsection{Пересечение матроидов}
 \begin{verbatim}
-    // check(ctaken, 1) -- first matroid
-    // check(ctaken, 2) -- second matroid    
-    vector<char> taken(m);
+// check(ctaken, 1) -- first matroid
+// check(ctaken, 2) -- second matroid    
+vector<char> taken(m);
+while (1) {
+    vector<vector<int>> e(m);
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < m; j++) {
+            if (taken[i] && !taken[j]) {
+                auto ctaken = taken;
+                ctaken[i] = 0;
+                ctaken[j] = 1;
+                if (check(ctaken, 2)) {
+                    e[i].push_back(j);
+                }
+            }
+            if (!taken[i] && taken[j]) {
+                auto ctaken = taken;
+                ctaken[i] = 1;
+                ctaken[j] = 0;
+                if (check(ctaken, 1)) {
+                    e[i].push_back(j);
+                }
+            }
+        }
+        }
+    vector<int> type(m);
+    // 0 -- cant, 1 -- can in \2, 2 -- can in \1
+    for (int i = 0; i < m; i++) {
+        if (!taken[i]) {
+            auto ctaken = taken;
+            ctaken[i] = 1;
+            if (check(ctaken, 2)) type[i] |= 1;
+        }
+        if (!taken[i]) {
+            auto ctaken = taken;
+            ctaken[i] = 1;
+            if (check(ctaken, 1)) type[i] |= 2;
+        }
+    }
+    vector<int> w(m);
+    for (int i = 0; i < m; i++) {
+        w[i] = taken[i] ? ed[i].c : -ed[i].c;
+    }
+    vector<pair<int, int>> d(m, {INF, 0});
+    for (int i = 0; i < m; i++) {
+        if (type[i] & 1) d[i] = {w[i], 0};
+    }
+    vector<int> pr(m, -1);
     while (1) {
-        vector<vector<int>> e(m);
+        vector<pair<int, int>> nd = d;
         for (int i = 0; i < m; i++) {
-            for (int j = 0; j < m; j++) {
-                if (taken[i] && !taken[j]) {
-                    auto ctaken = taken;
-                    ctaken[i] = 0;
-                    ctaken[j] = 1;
-                    if (check(ctaken, 2)) {
-                        e[i].push_back(j);
-                    }
-                }
-                if (!taken[i] && taken[j]) {
-                    auto ctaken = taken;
-                    ctaken[i] = 1;
-                    ctaken[j] = 0;
-                    if (check(ctaken, 1)) {
-                        e[i].push_back(j);
-                    }
+            if (d[i].first == INF) continue;
+            for (int to : e[i]) {
+                if (nd[to] > make_pair(d[i].first + w[to], d[i].second + 1)) {
+                    nd[to] = make_pair(d[i].first + w[to], d[i].second + 1);
+                    pr[to] = i;
                 }
             }
-         }
-        vector<int> type(m);
-        // 0 -- cant, 1 -- can in \2, 2 -- can in \1
-        for (int i = 0; i < m; i++) {
-            if (!taken[i]) {
-                auto ctaken = taken;
-                ctaken[i] = 1;
-                if (check(ctaken, 2)) type[i] |= 1;
-            }
-            if (!taken[i]) {
-                auto ctaken = taken;
-                ctaken[i] = 1;
-                if (check(ctaken, 1)) type[i] |= 2;
-            }
         }
-        vector<int> w(m);
-        for (int i = 0; i < m; i++) {
-            w[i] = taken[i] ? ed[i].c : -ed[i].c;
-        }
-        vector<pair<int, int>> d(m, {INF, 0});
-        for (int i = 0; i < m; i++) {
-            if (type[i] & 1) d[i] = {w[i], 0};
-        }
-        vector<int> pr(m, -1);
-        while (1) {
-            vector<pair<int, int>> nd = d;
-            for (int i = 0; i < m; i++) {
-                if (d[i].first == INF) continue;
-                for (int to : e[i]) {
-                    if (nd[to] > make_pair(d[i].first + w[to], d[i].second + 1)) {
-                        nd[to] = make_pair(d[i].first + w[to], d[i].second + 1);
-                        pr[to] = i;
-                    }
-                }
-            }
-            if (d == nd) break;
-            d = nd;
-        }
-        int v = -1;
-        for (int i = 0; i < m; i++) {
-            if ((d[i].first < INF && (type[i] & 2)) && (v == -1 || d[i] < d[v])) v = i;
-        }
-        if (v == -1) break;
-        while (v != -1) {
-            sum += w[v];
-            taken[v] ^= 1;
-            v = pr[v];
-        }
-        ans[--cnt] = sum;
-    }    
+        if (d == nd) break;
+        d = nd;
+    }
+    int v = -1;
+    for (int i = 0; i < m; i++) {
+        if ((d[i].first < INF && (type[i] & 2)) && (v == -1 || d[i] < d[v])) v = i;
+    }
+    if (v == -1) break;
+    while (v != -1) {
+        sum += w[v];
+        taken[v] ^= 1;
+        v = pr[v];
+    }
+    ans[--cnt] = sum;
+}    
 \end{verbatim}
 
 \subsection{Быстрый ввод-вывод}
@@ -1128,6 +1105,22 @@ namespace hpi{
 \end{verbatim}
 
 \twocolumn
+
+\subsection{Сумма линейных функций по модулю}
+\begin{verbatim}
+// sum(i=0..n-1) (a + b * i) div m
+ll solve(ll n, ll a, ll b, ll m) {
+    if (b == 0)
+       return n * (a / m);
+    if (a >= m)
+       return n * (a / m) + solve(n, a % m, b, m);
+    if (b >= m)
+       return n * (n - 1) / 2 * (b / m) + 
+                 solve(n, a, b % m, m);
+    return solve((a + b * n) / m, 
+                      (a + b * n) % m, m, b);
+}
+\end{verbatim}
 
 \subsection{Поллард}
 
