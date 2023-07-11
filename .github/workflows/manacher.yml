@@ -1,0 +1,20 @@
+name: Manacher CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install
+      run: pip install orjson selenium webdriver-manager
+    - name: test-timus
+      run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.ssh"
+      
