@@ -16,5 +16,5 @@ jobs:
     - name: install
       run: pip install orjson selenium webdriver-manager
     - name: test-timus
-      run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.ssh"
+      run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.sh"
       
