@@ -12,7 +12,7 @@ vi build_odd_palindromes(const string& s) {
     return length;
 }
 
-vi build_even_palindromes(consg string& s) {
+vi build_even_palindromes(const string& s) {
     int n = s.size();
     vi length(n);
     int l = 0, r = 0;
