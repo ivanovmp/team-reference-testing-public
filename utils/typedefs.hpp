@@ -7,6 +7,7 @@ using vi = vector<int>;
 using ui = uint32_t;
 using ul = uint64_t;
 using ll = int64_t;
+using pii = pair<int, int>;
 using pui = pair<ul, int>;
 using vpui = vector<pui>;
 using vu = vector<ul>;
