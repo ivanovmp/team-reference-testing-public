@@ -16,5 +16,9 @@ jobs:
     - name: install
       run: pip install orjson selenium webdriver-manager
     - name: test-timus
+
+      env:
+
+        credentials: ${{ secrets.AZURE_CREDENTIALS
       run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.sh"
       
