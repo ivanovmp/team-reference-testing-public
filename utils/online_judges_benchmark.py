@@ -224,7 +224,6 @@ class TimusOnlineJudge(Judge):
             resp = requests.get(url=f'https://acm.timus.ru/getverdict.aspx?id={submission_number}')
             content = resp.content.decode('utf-8')
             data = content.split('\r\n')
-            print(data)
             if resp.ok and len(data) == 6 and data[0] == 'RESULT':
                 data = content.split('\r\n')
                 return SubmissionResult(memory=int(data[4]),
