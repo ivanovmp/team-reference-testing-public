@@ -1,10 +1,6 @@
-#include<bits/stdc++.h>
-
-using namespace std;
-
-vector < int > build_odd_palindromes(string s) {
+vi build_odd_palindromes(const string& s) {
     int n = s.size();
-    vector < int > length(n, 1);
+    vi length(n, 1);
     int l = 0, r = 0;
     for (int i = 1; i < n; i++) {
         if (i <= r) length[i] = min(length[l + r - i], r - i + 1);
@@ -16,9 +12,9 @@ vector < int > build_odd_palindromes(string s) {
     return length;
 }
 
-vector < int > build_even_palindromes(string s) {
+vi build_even_palindromes(consg string& s) {
     int n = s.size();
-    vector < int > length(n);
+    vi length(n);
     int l = 0, r = 0;
     for (int i = 1; i < n; i++) {
         if (i <= r) length[i] = min(length[l + r - i + 1], r - i + 1);
