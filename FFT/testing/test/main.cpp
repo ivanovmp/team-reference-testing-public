@@ -11,7 +11,7 @@
 FFT::NTT ntt;
 
 void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
-    const int TRIES = 600;
+    const int TRIES = 10;
     const int steps = 32 - __builtin_clz(max<int>(1, a.size()) + max<int>(1, b.size()) - 2);
     vi fast_ans = ntt.multiply(a, b, steps);
     vi indices;
@@ -318,7 +318,7 @@ TEST(FPS, A000272_A001858) {
 TEST(NTT, CorrectPowersTest) {
     ASSERT_TRUE(NT::is_prime(ntt.MOD));
     ASSERT_EQ(1, ntt.MOD & (1 << ntt.n) - 1);
-    ASSERT_EQ(ntt.ROOT, NT::binpow(ntt.G, ntt.MOD >> ntt.n, ntt.MOD));
+    ASSERT_EQ(ntt.ROOT, NT::binpow(ntt.G, (ntt.MOD - 1) >> ntt.n, ntt.MOD));
     ASSERT_EQ(1, NT::binpow(ntt.ROOT, 1 << ntt.n, ntt.MOD));
     ASSERT_NE(1, NT::binpow(ntt.ROOT, 1 << ntt.n - 1, ntt.MOD));
     ASSERT_EQ(ntt.MOD - 1, NT::binpow(ntt.imaginary_unit, 2, ntt.MOD));

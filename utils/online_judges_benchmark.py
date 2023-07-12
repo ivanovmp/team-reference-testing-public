@@ -214,12 +214,14 @@ class TimusOnlineJudge(Judge):
             })
             content = resp.content.decode('utf-8')
             if resp.ok and content.startswith('SUCCESS'):
-                return content[len('SUCCESS') + 2:]
-            sleep(min(1 << i, 60))
+                submission_number = content[len('SUCCESS') + 2:]
+                print(f"Submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
+                return submission_number
+            sleep(min((1 << i) * .2, 60))
         raise Exception(f"Couldn't submit problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str,
-                    wait_time: float = 5) -> SubmissionResult:
+                    wait_time: float = 0) -> SubmissionResult:
         for i in range(20):
             resp = requests.get(url=f'https://acm.timus.ru/getverdict.aspx?id={submission_number}')
             content = resp.content.decode('utf-8')
@@ -229,7 +231,8 @@ class TimusOnlineJudge(Judge):
                 return SubmissionResult(memory=int(data[4]),
                                         time=int(data[3]),
                                         verdict=data[1])
-            sleep(1 << i)
+            sleep(wait_time)
+            wait_time = wait_time * 2 + .2
         raise Exception(f"Couldn't test submission {submission_number} for problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
 

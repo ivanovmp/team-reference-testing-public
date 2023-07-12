@@ -3,10 +3,10 @@ vi build_suffix_array(const string& s, const int max_code = 128) { // Codes of a
     vpii cur_array(n + 1), new_cur_array(n + 1);
     vi cnt(max(n + 1, max_code)), ptr(max(n + 1, max_code)),  value(n + 1);
 
-    for (auto c : s) cnt[c]++;
+    for (auto c : s) cnt[(uint8_t)c]++;
     ptr[0] = 1, cur_array[0] = {n, 0};
     for (int i = 1; i < max_code; i++) ptr[i] = ptr[i - 1] + cnt[i - 1];
-    for (int i = 0; i < n; i++) cur_array[ptr[s[i]]++] = {i, s[i]};
+    for (int i = 0; i < n; i++) cur_array[ptr[(uint8_t)s[i]]++] = {i, (uint8_t)s[i]};
     for (int i = 1; i <= n; i++) {
         cur_array[i].second = cur_array[i - 1].second;
         if (i == 1 || s[cur_array[i].first] != s[cur_array[i - 1].first]) cur_array[i].second++;

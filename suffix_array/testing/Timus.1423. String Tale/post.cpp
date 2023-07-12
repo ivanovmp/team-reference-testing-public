@@ -4,14 +4,15 @@ int main() {
     int n;
     cin >> n;
     string s, t;
-    cin >> s >> t;
+    getline(cin, s);
+    getline(cin, s);
+    getline(cin, t);
     const string g = s + ' ' + t;
     const vi suf = build_suffix_array(g, 256);
     const vi lcp = build_lcp(g, suf);
 
-    vi possible(n);
-    possible[0] = 1; {
-        int s_position = suf.find(suf.begin(), suf.end(), 0) - suf.begin();
+    vi possible(n); {
+        int s_position = find(suf.begin(), suf.end(), 0) - suf.begin();
         int common = n;
         for (int i = s_position - 1; i >= 0; --i) {
             common = min(common, lcp[i]);
@@ -19,7 +20,7 @@ int main() {
                 ++possible[n - common];
         }
     } {
-        int t_position = suf.find(suf.begin(), suf.end(), n + 1) - suf.begin();
+        int t_position = find(suf.begin(), suf.end(), n + 1) - suf.begin();
         int common = n;
         for (int i = t_position - 1; i >= 0; --i) {
             common = min(common, lcp[i]);
