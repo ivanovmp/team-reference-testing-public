@@ -1,11 +1,7 @@
-#include<bits/stdc++.h>
-
-using namespace std;
-
-vector < int > build_suffix_array(string s) { // Codes of all characters from 32 to 127, 0-indexing, 300ms for strings less than 4e5
-    int max_code = 128, n = s.size();
-    vector < pair < int, int > > cur_array(n + 1), new_cur_array(n + 1);
-    vector < int > cnt(max(n + 1, max_code)), ptr(max(n + 1, max_code)),  value(n + 1);
+vi build_suffix_array(const string& s, const int max_code = 128) { // Codes of all characters from 32 to 127, 0-indexing, 300ms for strings less than 4e5
+    const int n = s.size();
+    vpii cur_array(n + 1), new_cur_array(n + 1);
+    vi cnt(max(n + 1, max_code)), ptr(max(n + 1, max_code)),  value(n + 1);
 
     for (auto c : s) cnt[c]++;
     ptr[0] = 1, cur_array[0] = {n, 0};
@@ -45,14 +41,14 @@ vector < int > build_suffix_array(string s) { // Codes of all characters from 32
         length *= 2;
     }
 
-    vector < int > suffix_array;
+    vi suffix_array;
     for (int i = 1; i < (int)cur_array.size(); i++) suffix_array.push_back(cur_array[i].first);
     return suffix_array;
 }
 
-vector < int > build_lcp(string s, vector < int > suffix_array) { // 0-indexing
+vi build_lcp(const string& s, const vi& suffix_array) { // 0-indexing
     int n = s.size(), ptr = 0;
-    vector < int > ans(n - 1), pos(n);
+    vi ans(n - 1), pos(n);
     for (int i = 0; i < n; i++) pos[suffix_array[i]] = i;
 
     for (int i = 0; i < n; i++) {
