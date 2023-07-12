@@ -1,4 +1,4 @@
-name: Cycle shifts via suffix array
+name: Cycle shifts via suffix array CI
 
 on:
   push:

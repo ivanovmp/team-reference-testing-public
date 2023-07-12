@@ -1,0 +1,23 @@
+name: FFT Timus.1996 CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install
+      run: pip install orjson selenium webdriver-manager
+    - name: test-timus
+      env:
+        TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
+        TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
+      run: bash "./FFT/testing/Timus.1996. Cipher Message 3/test.sh"
+      

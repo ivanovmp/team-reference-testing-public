@@ -3,14 +3,13 @@
 namespace FFT {
     class NTT {
     public:
-        const int n = 20;
-        const int size = (1 << n);
+        const int n; // <= 23
+        const int size; // == 1 << n
         const int MOD = 998244353, G = 3;
-        const int ROOT = 565042129;
+        const int ROOT; // = 565042129 for n == 20;
 
-        NTT() : revers(size), root(size),
+        NTT(int n = 20) : n(n), size(1 << n), ROOT(NT::binpow(G, (MOD - 1) >> n, MOD)), revers(size), root(size, 1),
                 fftA(size), fftB(size) {
-            root[0] = 1;
             for (int i = 1; i < size; i++)
                 root[i] = (ll) root[i - 1] * ROOT % MOD;
         }

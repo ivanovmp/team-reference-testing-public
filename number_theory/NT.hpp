@@ -1,5 +1,6 @@
 #pragma once
 namespace NT {
+#ifdef __GNUC__
     struct Barrett {
         ul b, m;
         Barrett() : b(), m() {}
@@ -9,6 +10,7 @@ namespace NT {
             return r - b * (r >= b);
         }
     };
+#endif
     ui isqrt_approx(ul n) {
         return sqrt(n);
     }
@@ -46,9 +48,12 @@ namespace NT {
         if ((b = a - b) > a) b += m;
         return b;
     }
+
+#ifdef __GNUC__
 	ul prod(ul a, ul b, ul m) {
 		return (__uint128_t)a * b % m;
 	}
+#endif
     ul gcd(ul a, ul b) {
         while (b) { a %= b; swap(a, b); }
         return a;
