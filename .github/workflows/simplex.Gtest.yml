@@ -1,0 +1,21 @@
+name: Simplex Gtest CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  gtest:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: cmake
+      run: cd ./simplex/testing/gtest/ && cmake .
+    - name: gtest-make
+      run: cd ./simplex/testing/gtest && make
+    - name: gtest
+      run: cd ./simplex/testing/gtest && ./TestTeamReferenceSimplex
