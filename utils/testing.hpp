@@ -42,3 +42,4 @@ vector<Long> choose_n_numbers(const Long mn, const Long mx, const Long n) {
     return numbers_vector;
 }
 
+#define mp make_pair

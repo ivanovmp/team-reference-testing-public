@@ -1,0 +1,23 @@
+name: Simplex Timus.1417 CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install
+      run: pip install orjson selenium webdriver-manager
+    - name: test-timus
+      env:
+        TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
+        TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
+      run: bash "./simplex/testing/Timus.1417. Space Poker 2/test.sh"
+      

@@ -9,6 +9,7 @@ using ll = int64_t;
 using ld = long double;
 using pii = pair<int, int>;
 using pui = pair<ul, int>;
+using pub = pair<ui, bool>;
 using vi = vector<int>;
 using vb = vector<bool>;
 using vd = vector<double>;
