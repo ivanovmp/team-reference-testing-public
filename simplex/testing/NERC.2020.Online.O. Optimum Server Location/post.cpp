@@ -54,5 +54,5 @@ int main() {
     ld num_ans = -simplex.solve(ans);
     cout << fixed << setprecision(0) << num_ans << '\n';
     for (int i = 0; i < n; ++i)
-        cout << max<db>(0, ans[i]) << " \n"[i == n - 1];
+        cout << max<ld>(0, ans[i]) << " \n"[i == n - 1];
 }
