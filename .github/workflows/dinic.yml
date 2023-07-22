@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install
-      run: python3 ./utils/firefox/prepare-firefox.sh
+      run: sh ./utils/firefox/prepare-firefox.sh
     - name: test-cf
       run: cd ./dinic/testing/marbles/ && python3 test.py
       
