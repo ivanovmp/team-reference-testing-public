@@ -59,7 +59,7 @@ def get_firefox_driver() -> webdriver.Firefox:
     ]
     for option in array_options:
         firefox_options.add_argument(option)
-    firefox_service = FirefoxService(installation)
+    firefox_service = FirefoxService(firefox_installation)
     firefox_driver = webdriver.Firefox(service=firefox_service, options=firefox_options)
     return firefox_driver
 
