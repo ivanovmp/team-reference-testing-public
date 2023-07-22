@@ -1,4 +1,4 @@
-name: Cycle shifts via suffix array CI
+name: Cycle shifts (Timus.1423) via z-function CI
 
 on:
   push:
@@ -19,5 +19,5 @@ jobs:
       env:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
-      run: bash "./suffix_array/testing/Timus.1423. String Tale/test.sh"
+      run: bash "./basic_strings/testing/Timus.1423. String Tale/test.sh"
       

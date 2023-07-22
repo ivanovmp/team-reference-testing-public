@@ -1,4 +1,4 @@
-name: Suffix Array CI
+name: Suffix Array Timus.1590 CI
 
 on:
   push:
