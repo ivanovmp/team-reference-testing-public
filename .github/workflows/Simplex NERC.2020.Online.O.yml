@@ -1,0 +1,22 @@
+name: Simplex NERC.2020.Online.O CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: install
+        run: sh ./utils/firefox/prepare-firefox.sh
+      - name: test-cf
+        env:
+          CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
+          CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+        run: bash "./simplex/testing/NERC.2020.Online.O. Optimum Server Location/test.sh"

@@ -9,6 +9,10 @@ from webdriver_manager.opera import OperaDriverManager
 from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
 from time import sleep
 import requests
 import orjson
@@ -39,6 +43,25 @@ def get_chrome_driver() -> webdriver.Chrome:
     for option in options:
         chrome_options.add_argument(option)
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
+
+
+def get_firefox_driver() -> webdriver.Firefox:
+    firefox_installation = GeckoDriverManager().install()
+    firefox_options = webdriver.FirefoxOptions()
+    array_options = [
+        "--headless",
+        "--disable-gpu",
+        "--window-size=1920,1200",
+        "--ignore-certificate-errors",
+        "--disable-extensions",
+        "--no-sandbox",
+        "--disable-dev-shm-usage"
+    ]
+    for option in array_options:
+        firefox_options.add_argument(option)
+    firefox_service = FirefoxService(firefox_installation)
+    firefox_driver = webdriver.Firefox(service=firefox_service, options=firefox_options)
+    return firefox_driver
 
 
 def get_opera_driver() -> webdriver.Remote:
@@ -88,7 +111,7 @@ class Judge:
 class Codeforces(Judge):
     def __init__(self, login_str: str, password: str) -> None:
         super().__init__(login_str, password)
-        self.driver = get_chrome_driver()
+        self.driver = get_firefox_driver()
 
     def login(self) -> None:
         self.driver.get("https://codeforces.com/enter")
@@ -104,7 +127,7 @@ class Codeforces(Judge):
 
         while self.driver.current_url != self.get_link("/"):
             sleep(.05)
-        eprint(f"Logged in! Redirected to page {self.driver.current_url}.")
+        eprint(f"Logged in! Redirected to page {self.driver.current_url}")
 
     def get_link(self, link) -> str:
         return "https://codeforces.com" + link
@@ -113,16 +136,22 @@ class Codeforces(Judge):
         return 1 if sys.platform == "win32" else 2
 
     def get_problem_link(self, problemset_name: str, contest_name: str, problem_name: str) -> str:
-        if problemset_name == "gym":
+        if problemset_name == "gym" or problemset_name == "contest":
             return self.get_link(f"/{problemset_name}/{contest_name}/problem/{problem_name}")
         else:
             return self.get_link(f"/{problemset_name}/problem/{contest_name}/{problem_name}")
 
     def get_submit_link(self, problemset_name: str, contest_name: str) -> str:
-        if problemset_name == "gym":
+        if problemset_name == "gym" or problemset_name == "contest":
             return self.get_link(f"/{problemset_name}/{contest_name}/submit")
         else:
             return self.get_link(f"/{problemset_name}/submit")
+
+    def get_submission_link(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str) -> str:
+        if problemset_name == "gym" or problemset_name == "contest":
+            return self.get_link(f"/{problemset_name}/{contest_name}/submission/{submission_number}")
+        else:
+            raise Exception(f"While trying to get the link to submission {submission_number}, got unknown source of the contest {contest_name} and problem {problem_name}: {problemset_name=}")
 
     def get_status_link(self, problemset_name: str, contest_name: str) -> str:
         if problemset_name == "gym":
@@ -135,11 +164,18 @@ class Codeforces(Judge):
         menu = self.driver.find_element(By.CLASS_NAME, "second-level-menu-list")
         links = menu.find_elements(By.XPATH, ".//li/a")
         submit_link = links[1]
-        eprint(f"Read the statement on page {self.driver.current_url}.")
+        eprint(f"Read the statement on page {self.driver.current_url}")
         submit_link.click()
-        eprint(f"Went to submit tab: {self.driver.current_url}.")
-
-        language_field = self.driver.find_element(By.NAME, "programTypeId")
+        eprint(f"Went to submit tab: {self.driver.current_url}")
+        LANGUAGE_TRIES = 20
+        for i in range(LANGUAGE_TRIES):
+            try:
+                language_field = self.driver.find_element(By.NAME, "programTypeId")
+            except:
+                if i < LANGUAGE_TRIES - 1:
+                    sleep(.1)
+                else:
+                    raise Exception("Unable to find the list of languages!")
         language_field.click()
         for our_language_field in language_field.find_elements(By.XPATH, ".//option"):
             if our_language_field.get_attribute("value") == "54":
@@ -161,7 +197,7 @@ class Codeforces(Judge):
 
         rows = self.driver.find_elements(By.CLASS_NAME, "highlighted-row")
         submission_number = rows[0].get_attribute("data-submission-id")
-        eprint(f"Submission number is {submission_number}.")
+        eprint(f"The link to the submission is {self.get_submission_link(problemset_name, contest_name, problem_name, submission_number)}")
         return submission_number
 
     def finish(self) -> None:
@@ -170,7 +206,7 @@ class Codeforces(Judge):
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str, wait_time: float = 5.) -> SubmissionResult:
         for i in range(20):
             address = self.get_link(f"/api/contest.status?contestId={contest_name}&count=100&handle={self.login_str}")
-            eprint(f"Trying to get verdict via {address}.")
+            eprint(f"Trying to get verdict via {address}")
             r = requests.get(address)
             response = orjson.loads(r.text)
             if "status" not in response or response["status"] != "OK":
@@ -189,7 +225,9 @@ class Codeforces(Judge):
             verdict = my_submission.get("verdict")
             if verdict is not None and verdict != "TESTING":
                 eprint(f"Got verdict {verdict}")
-                return my_submission # TODO: convert to SubmissionResult
+                return SubmissionResult(memory=my_submission.get("memoryConsumedBytes"),
+                                        time=my_submission.get("timeConsumedMillis"),
+                                        verdict=my_submission.get("verdict"))
             eprint(f"Still testing, try again in {wait_time} second(s)...")
             sleep(wait_time)
             wait_time = max(1., 2 * wait_time)
@@ -200,6 +238,7 @@ class TimusOnlineJudge(Judge):
         super().__init__(login_str, password)
 
     def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str) -> str:
+        eprint(f"Trying to submit problem {problem_name}, {problemset_name=}, {contest_name=}.")
         if not problemset_name:
             problemset_name = "1"
         with open(submission_filename, 'r') as f:
@@ -215,24 +254,28 @@ class TimusOnlineJudge(Judge):
             content = resp.content.decode('utf-8')
             if resp.ok and content.startswith('SUCCESS'):
                 submission_number = content[len('SUCCESS') + 2:]
-                print(f"Submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
+                eprint(f"Successfully submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
                 return submission_number
-            sleep(min((1 << i) * .2, 60))
+            wait_time = min((1 << i) * .2, 16)
+            eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
+            sleep(wait_time)
         raise Exception(f"Couldn't submit problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str,
                     wait_time: float = 0) -> SubmissionResult:
+        eprint(f"Trying to get verdict of submission {submission_number} to problem {problem_name}, {problemset_name=}, {contest_name=}.")
         for i in range(20):
             resp = requests.get(url=f'https://acm.timus.ru/getverdict.aspx?id={submission_number}')
             content = resp.content.decode('utf-8')
             data = content.split('\r\n')
             if resp.ok and len(data) == 6 and data[0] == 'RESULT':
                 data = content.split('\r\n')
-                return SubmissionResult(memory=int(data[4]),
+                return SubmissionResult(memory=int(data[4]) * 1024,
                                         time=int(data[3]),
                                         verdict=data[1])
+            eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
             sleep(wait_time)
-            wait_time = wait_time * 2 + .2
+            wait_time = min(wait_time * 2 + .2, 16)
         raise Exception(f"Couldn't test submission {submission_number} for problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
 

@@ -31,6 +31,6 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/googletest-src/googletest/include)
 
-add_executable(TestTeamReferenceFFT main.cpp)
-target_link_libraries(TestTeamReferenceFFT gtest_main)
-add_test(NAME TestTeamReference_test COMMAND TestTeamReferenceFFT)
+add_executable(TestTeamReferenceSimplex main.cpp)
+target_link_libraries(TestTeamReferenceSimplex gtest_main)
+add_test(NAME TestTeamReferenceSimplex_test COMMAND TestTeamReferenceSimplex)

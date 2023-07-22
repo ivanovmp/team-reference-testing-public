@@ -1,4 +1,4 @@
-name: FFT Timus.1996 CI
+name: Manacher Timus.1297 CI
 
 on:
   push:
@@ -19,5 +19,4 @@ jobs:
       env:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
-      run: bash "./FFT/testing/Timus.1996. Cipher Message 3/test.sh"
-      
+      run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.sh"

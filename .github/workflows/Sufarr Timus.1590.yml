@@ -1,4 +1,4 @@
-name: Cycle shifts via suffix array CI
+name: Suffix Array Timus.1590 CI
 
 on:
   push:
@@ -19,5 +19,4 @@ jobs:
       env:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
-      run: bash "./suffix_array/testing/Timus.1423. String Tale/test.sh"
-      
+      run: bash "./suffix_array/testing/Timus.1590. Bacon’s Cipher/test.sh"
