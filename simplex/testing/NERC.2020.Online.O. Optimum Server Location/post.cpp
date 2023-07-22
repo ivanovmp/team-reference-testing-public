@@ -49,7 +49,7 @@ int main() {
         for (int j = 0; j < m; ++j) {
             C[n + i * m + j] = -c[i][j];
         }
-    Simplex<ld> simplex(A, B, C);
+    Simplex<ld> simplex(A, B, C, 1e-15);
     vf ans;
     ld num_ans = -simplex.solve(ans);
     cout << fixed << setprecision(0) << num_ans << '\n';
