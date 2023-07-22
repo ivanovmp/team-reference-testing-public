@@ -225,6 +225,7 @@ class TimusOnlineJudge(Judge):
         super().__init__(login_str, password)
 
     def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str) -> str:
+        eprint(f"Trying to submit problem {problem_name}, {problemset_name=}, {contest_name=}.")
         if not problemset_name:
             problemset_name = "1"
         with open(submission_filename, 'r') as f:
@@ -240,13 +241,16 @@ class TimusOnlineJudge(Judge):
             content = resp.content.decode('utf-8')
             if resp.ok and content.startswith('SUCCESS'):
                 submission_number = content[len('SUCCESS') + 2:]
-                print(f"Submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
+                eprint(f"Successfully submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
                 return submission_number
-            sleep(min((1 << i) * .2, 60))
+            wait_time = min((1 << i) * .2, 60)
+            eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
+            sleep(wait_time)
         raise Exception(f"Couldn't submit problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str,
                     wait_time: float = 0) -> SubmissionResult:
+        eprint(f"Trying to get verdict of submission {submission_number} to problem {problem_name}, {problemset_name=}, {contest_name=}.")
         for i in range(20):
             resp = requests.get(url=f'https://acm.timus.ru/getverdict.aspx?id={submission_number}')
             content = resp.content.decode('utf-8')
@@ -256,6 +260,7 @@ class TimusOnlineJudge(Judge):
                 return SubmissionResult(memory=int(data[4]) * 1024,
                                         time=int(data[3]),
                                         verdict=data[1])
+            eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
             sleep(wait_time)
             wait_time = min(wait_time * 2 + .2, 16)
         raise Exception(f"Couldn't test submission {submission_number} for problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
