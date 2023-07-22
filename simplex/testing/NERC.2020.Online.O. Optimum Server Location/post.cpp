@@ -37,11 +37,11 @@ int main() {
         for (int j = 0; j < i; ++j) {
             A[2 * m * n + i * (i - 1) + 2 * j][i] = 1;
             A[2 * m * n + i * (i - 1) + 2 * j][j] = -1;
-            A[2 * m * n + i * (i - 1) + 2 * j][i * (i - 1) / 2 + j] = -1;
+            A[2 * m * n + i * (i - 1) + 2 * j][n * (m + 1) + i * (i - 1) / 2 + j] = -1;
 
             A[2 * m * n + i * (i - 1) + 2 * j + 1][i] = -1;
             A[2 * m * n + i * (i - 1) + 2 * j + 1][j] = 1;
-            A[2 * m * n + i * (i - 1) + 2 * j + 1][i * (i - 1) / 2 + j] = -1;
+            A[2 * m * n + i * (i - 1) + 2 * j + 1][n * (m + 1) + i * (i - 1) / 2 + j] = -1;
         }
     // We're trying to maximize MINUS ans
     vf C(VARS);
