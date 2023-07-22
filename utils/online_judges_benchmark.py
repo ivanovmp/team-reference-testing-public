@@ -127,7 +127,7 @@ class Codeforces(Judge):
 
         while self.driver.current_url != self.get_link("/"):
             sleep(.05)
-        eprint(f"Logged in! Redirected to page {self.driver.current_url}.")
+        eprint(f"Logged in! Redirected to page {self.driver.current_url}")
 
     def get_link(self, link) -> str:
         return "https://codeforces.com" + link
@@ -164,9 +164,9 @@ class Codeforces(Judge):
         menu = self.driver.find_element(By.CLASS_NAME, "second-level-menu-list")
         links = menu.find_elements(By.XPATH, ".//li/a")
         submit_link = links[1]
-        eprint(f"Read the statement on page {self.driver.current_url}.")
+        eprint(f"Read the statement on page {self.driver.current_url}")
         submit_link.click()
-        eprint(f"Went to submit tab: {self.driver.current_url}.")
+        eprint(f"Went to submit tab: {self.driver.current_url}")
 
         language_field = self.driver.find_element(By.NAME, "programTypeId")
         language_field.click()
@@ -190,7 +190,7 @@ class Codeforces(Judge):
 
         rows = self.driver.find_elements(By.CLASS_NAME, "highlighted-row")
         submission_number = rows[0].get_attribute("data-submission-id")
-        eprint(f"The link to the submission is {self.get_submission_link(problemset_name, contest_name, problem_name, submission_number)}.")
+        eprint(f"The link to the submission is {self.get_submission_link(problemset_name, contest_name, problem_name, submission_number)}")
         return submission_number
 
     def finish(self) -> None:
