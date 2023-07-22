@@ -30,11 +30,11 @@ int main() {
         for (int j = 0; j < m; ++j) {
             A[n - 1 + 2 * (i * m + j)][i] = 1;
             A[n - 1 + 2 * (i * m + j)][n + i * m + j] = -1;
-            B[n - 1 + 2 * (i * m + j)] = -a[j];
+            B[n - 1 + 2 * (i * m + j)] = a[j];
 
             A[n - 1 + 2 * (i * m + j) + 1][i] = -1;
             A[n - 1 + 2 * (i * m + j) + 1][n + i * m + j] = -1;
-            B[n - 1 + 2 * (i * m + j) + 1] = a[j];
+            B[n - 1 + 2 * (i * m + j) + 1] = -a[j];
         }
     // We're trying to maximize MINUS ans
     vf C(VARS);
@@ -54,5 +54,5 @@ int main() {
     ld num_ans = -simplex.solve(ans);
     cout << fixed << setprecision(0) << num_ans << '\n';
     for (int i = 0; i < n; ++i)
-        cout << ans[i] << " \n"[i == n - 1];
+        cout << max<db>(0, ans[i]) << " \n"[i == n - 1];
 }
