@@ -13,11 +13,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-      env:
-        CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
-        CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
     - name: install
       run: sh ./utils/firefox/prepare-firefox.sh
     - name: test-cf
+      env:
+        CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
+        CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
       run: cd ./dinic/testing/marbles/ && python3 test.py
       
