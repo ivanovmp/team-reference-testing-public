@@ -6,7 +6,7 @@
 #include <cmath>
 #define mp make_pair
 using namespace std;
-using ld = long double;
+using ld = double;
 using vi = vector<int>;
 using vvi = vector<vi>;
 using vf = vector<ld>;
