@@ -199,7 +199,7 @@ class Codeforces(Judge):
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str, wait_time: float = 5.) -> SubmissionResult:
         for i in range(20):
             address = self.get_link(f"/api/contest.status?contestId={contest_name}&count=100&handle={self.login_str}")
-            eprint(f"Trying to get verdict via {address}.")
+            eprint(f"Trying to get verdict via {address}")
             r = requests.get(address)
             response = orjson.loads(r.text)
             if "status" not in response or response["status"] != "OK":
