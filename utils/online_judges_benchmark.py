@@ -243,7 +243,7 @@ class TimusOnlineJudge(Judge):
                 submission_number = content[len('SUCCESS') + 2:]
                 eprint(f"Successfully submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
                 return submission_number
-            wait_time = min((1 << i) * .2, 60)
+            wait_time = min((1 << i) * .2, 16)
             eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
             sleep(wait_time)
         raise Exception(f"Couldn't submit problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
