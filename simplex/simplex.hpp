@@ -37,20 +37,16 @@ struct Simplex {
             D[r][s] = 1. / D[r][s];
             swap(B[r], N[s]);
     }
-    template<class Iter>
-    db norm_sq(Iter b, Iter e) {
-        db q = 0;
-        for (Iter i = b; i != e; ++i)
-            q += *i * *i;
-        return q;
-    }
     bool simplex(int p) {
         int x = m + (p == 1);
         while (true) {
             int s = -1; db v = -1;
             for (int j = 0; j <= n; ++j) {
                 if (p == 2 && N[j] == -1) continue;
-                db q = max(EPS, norm_sq(D[j].begin(), D[j].begin() + m + 1));
+                db q = 0;
+                for (int k = 0; k <= m; ++k)
+                    q += pow(D[k][j], 2);
+                q = max(q, EPS);
                 db vj = D[x][j] / sqrt(q);
                 if (s == -1 || mp(vj, N[j]) < mp(v, N[s])) s = j, v = vj;
             }
