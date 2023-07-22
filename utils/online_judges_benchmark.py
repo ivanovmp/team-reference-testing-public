@@ -136,16 +136,22 @@ class Codeforces(Judge):
         return 1 if sys.platform == "win32" else 2
 
     def get_problem_link(self, problemset_name: str, contest_name: str, problem_name: str) -> str:
-        if problemset_name == "gym":
+        if problemset_name == "gym" or problemset_name == "contest":
             return self.get_link(f"/{problemset_name}/{contest_name}/problem/{problem_name}")
         else:
             return self.get_link(f"/{problemset_name}/problem/{contest_name}/{problem_name}")
 
     def get_submit_link(self, problemset_name: str, contest_name: str) -> str:
-        if problemset_name == "gym":
+        if problemset_name == "gym" or problemset_name == "contest":
             return self.get_link(f"/{problemset_name}/{contest_name}/submit")
         else:
             return self.get_link(f"/{problemset_name}/submit")
+
+    def get_submission_link(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str) -> str:
+        if problemset_name == "gym" or problemset_name == "contest":
+            return self.get_link(f"/{problemset_name}/{contest_name}/submission/{submission_number}")
+        else:
+            raise Exception(f"While trying to get the link to submission {submission_number}, got unknown source of the contest {contest_name} and problem {problem_name}: {problemset_name=}")
 
     def get_status_link(self, problemset_name: str, contest_name: str) -> str:
         if problemset_name == "gym":
@@ -184,7 +190,7 @@ class Codeforces(Judge):
 
         rows = self.driver.find_elements(By.CLASS_NAME, "highlighted-row")
         submission_number = rows[0].get_attribute("data-submission-id")
-        eprint(f"Submission number is {submission_number}.")
+        eprint(f"The link to the submission is {self.get_submission_link(problemset_name, contest_name, problem_name, submission_number)}.")
         return submission_number
 
     def finish(self) -> None:
