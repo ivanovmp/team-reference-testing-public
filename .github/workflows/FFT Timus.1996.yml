@@ -20,4 +20,3 @@ jobs:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
       run: bash "./FFT/testing/Timus.1996. Cipher Message 3/test.sh"
-      
