@@ -13,7 +13,7 @@ int main() {
         for (int j = 0; j < n; ++j)
             cin >> d[i][j];
 
-    const int VARS = n * (m + 1), CONDS = 0;
+    const int VARS = n * (m + 1), CONDS = n * (2 * m + 1) - 1;
     // vars:
     //   0..n-1 are the positions of servers
     //   n..n+mn-1 are distances between regular and CDN servers:
@@ -32,9 +32,9 @@ int main() {
             A[n - 1 + 2 * (i * m + j)][n + i * m + j] = -1;
             B[n - 1 + 2 * (i * m + j)] = -a[j];
 
-            A[n - 1 + 2 * (i * m + j)][i] = -1;
-            A[n - 1 + 2 * (i * m + j)][n + i * m + j] = -1;
-            B[n - 1 + 2 * (i * m + j)] = a[j];
+            A[n - 1 + 2 * (i * m + j) + 1][i] = -1;
+            A[n - 1 + 2 * (i * m + j) + 1][n + i * m + j] = -1;
+            B[n - 1 + 2 * (i * m + j) + 1] = a[j];
         }
     // We're trying to maximize MINUS ans
     vf C(VARS);
