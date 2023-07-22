@@ -9,6 +9,10 @@ from webdriver_manager.opera import OperaDriverManager
 from webdriver_manager.core.utils import ChromeType
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from webdriver_manager.firefox import GeckoDriverManager
+
 from time import sleep
 import requests
 import orjson
@@ -39,6 +43,25 @@ def get_chrome_driver() -> webdriver.Chrome:
     for option in options:
         chrome_options.add_argument(option)
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
+
+
+def get_firefox_driver() -> webdriver.Firefox:
+    firefox_installation = GeckoDriverManager().install()
+    firefox_options = webdriver.FirefoxOptions()
+    array_options = [
+        "--headless",
+        "--disable-gpu",
+        "--window-size=1920,1200",
+        "--ignore-certificate-errors",
+        "--disable-extensions",
+        "--no-sandbox",
+        "--disable-dev-shm-usage"
+    ]
+    for option in array_options:
+        firefox_options.add_argument(option)
+    firefox_service = FirefoxService(installation)
+    firefox_driver = webdriver.Firefox(service=firefox_service, options=firefox_options)
+    return firefox_driver
 
 
 def get_opera_driver() -> webdriver.Remote:
@@ -88,7 +111,7 @@ class Judge:
 class Codeforces(Judge):
     def __init__(self, login_str: str, password: str) -> None:
         super().__init__(login_str, password)
-        self.driver = get_chrome_driver()
+        self.driver = get_firefox_driver()
 
     def login(self) -> None:
         self.driver.get("https://codeforces.com/enter")
