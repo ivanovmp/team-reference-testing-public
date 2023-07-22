@@ -167,8 +167,15 @@ class Codeforces(Judge):
         eprint(f"Read the statement on page {self.driver.current_url}")
         submit_link.click()
         eprint(f"Went to submit tab: {self.driver.current_url}")
-
-        language_field = self.driver.find_element(By.NAME, "programTypeId")
+        LANGUAGE_TRIES = 20
+        for i in range(LANGUAGE_TRIES):
+            try:
+                language_field = self.driver.find_element(By.NAME, "programTypeId")
+            except:
+                if i < LANGUAGE_TRIES - 1:
+                    sleep(.1)
+                else:
+                    raise Exception("Unable to find the list of languages!")
         language_field.click()
         for our_language_field in language_field.find_elements(By.XPATH, ".//option"):
             if our_language_field.get_attribute("value") == "54":
