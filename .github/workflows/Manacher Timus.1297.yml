@@ -20,4 +20,3 @@ jobs:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
       run: bash "./palindromes/testing/Timus.1297 - Palindromes/test.sh"
-      

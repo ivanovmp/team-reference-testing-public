@@ -20,4 +20,3 @@ jobs:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
       run: bash "./simplex/testing/Timus.1417. Space Poker 2/test.sh"
-      

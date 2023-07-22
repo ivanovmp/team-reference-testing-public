@@ -20,4 +20,3 @@ jobs:
         CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
         CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
       run: bash ./dinic/testing/marbles/test.sh
-      
