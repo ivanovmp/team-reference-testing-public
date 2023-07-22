@@ -1,4 +1,4 @@
-name: Number Theory CI
+name: Number Theory Gtest CI
 
 on:
   push:

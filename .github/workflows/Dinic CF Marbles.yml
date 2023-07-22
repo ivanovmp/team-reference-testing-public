@@ -1,4 +1,4 @@
-name: Dinic CI
+name: Dinic CF Marbles CI
 
 on:
   push:
@@ -19,5 +19,5 @@ jobs:
       env:
         CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
         CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
-      run: cd ./dinic/testing/marbles/ && python3 test.py
+      run: bash ./dinic/testing/marbles/test.sh
       

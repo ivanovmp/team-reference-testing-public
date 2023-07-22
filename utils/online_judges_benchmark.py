@@ -212,7 +212,9 @@ class Codeforces(Judge):
             verdict = my_submission.get("verdict")
             if verdict is not None and verdict != "TESTING":
                 eprint(f"Got verdict {verdict}")
-                return my_submission # TODO: convert to SubmissionResult
+                return SubmissionResult(memory=my_submission.get("memoryConsumedBytes"),
+                                        time=my_submission.get("timeConsumedMillis"),
+                                        verdict=my_submission.get("verdict"))
             eprint(f"Still testing, try again in {wait_time} second(s)...")
             sleep(wait_time)
             wait_time = max(1., 2 * wait_time)
@@ -251,11 +253,11 @@ class TimusOnlineJudge(Judge):
             data = content.split('\r\n')
             if resp.ok and len(data) == 6 and data[0] == 'RESULT':
                 data = content.split('\r\n')
-                return SubmissionResult(memory=int(data[4]),
+                return SubmissionResult(memory=int(data[4]) * 1024,
                                         time=int(data[3]),
                                         verdict=data[1])
             sleep(wait_time)
-            wait_time = wait_time * 2 + .2
+            wait_time = min(wait_time * 2 + .2, 16)
         raise Exception(f"Couldn't test submission {submission_number} for problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
 
