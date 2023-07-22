@@ -47,18 +47,18 @@ int main() {
     vf C(VARS);
     // firstly, the distances between servers
     for (int i = 0; i < n; ++i)
-        for (int j = 0; j < 9; ++j) {
-            C[i * (i - 1) / 2 + j] -= d[i][j];
+        for (int j = 0; j < i; ++j) {
+            C[n + n * m + i * (i - 1) / 2 + j] -= d[i][j];
         }
     // secondly, the pairwise distances between servers and CDN servers
     for (int i = 0; i < n; ++i)
         for (int j = 0; j < m; ++j) {
             C[n + i * m + j] = -c[i][j];
         }
-    Simplex<ld> simplex(A, B, C, 1e-15);
+    Simplex<ld> simplex(A, B, C, 1e-9);
     vf ans;
     ld num_ans = -simplex.solve(ans);
-    cout << fixed << setprecision(0) << num_ans << '\n';
+    cout << fixed << setprecision(0) << max<ld>(0, num_ans) << '\n';
     for (int i = 0; i < n; ++i)
         cout << max<ld>(0, ans[i]) << " \n"[i == n - 1];
 }
