@@ -30,7 +30,7 @@ int main() {
         A[i + 1][n] = 1;
         // now we lose money for every row of our choice
         for (int j = 0; j < n; ++j)
-            A[i + 1][j] = -a[j][i];
+            A[i + 1][j] = -v[j][i];
         // we have to get nonpositive after this, so B[i + 1] = 0
     }
 
