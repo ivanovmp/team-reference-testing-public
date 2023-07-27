@@ -8,8 +8,8 @@ int main() {
     getline(cin, s);
     getline(cin, t);
     const string g = s + ' ' + t;
-    const vi suf = build_suffix_array<uint8_t>(g, 256);
-    const vi lcp = build_lcp(g, suf);
+    const vi suf = build_suffix_array<uint8_t>(g.begin(), g.end(), 256);
+    const vi lcp = build_lcp(g.begin(), g.end(), suf);
 
     vi possible(n); {
         int s_position = find(suf.begin(), suf.end(), 0) - suf.begin();
