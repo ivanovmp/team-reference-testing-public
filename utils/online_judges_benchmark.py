@@ -6,9 +6,9 @@ from selenium.webdriver.chrome import service
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.opera import OperaDriverManager
 
-from webdriver_manager.core.utils import ChromeType
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+# from webdriver_manager.core.utils import ChromeType
+# from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.chrome.service import Service
 
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
@@ -29,6 +29,7 @@ def eprint(*args, **kwargs):
 
 
 def get_chrome_driver() -> webdriver.Chrome:
+    raise Exception("Chrome Driver is not supported.")
     chrome_service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     chrome_options = Options()
     options = [
