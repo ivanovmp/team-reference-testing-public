@@ -1,0 +1,21 @@
+name: Burrows-Wheeler Transform Gtest CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  gtest:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: cmake
+      run: cd ./burrows_wheeler/testing/gtest/ && cmake .
+    - name: gtest-make
+      run: cd ./burrows_wheeler/testing/gtest && make
+    - name: gtest
+      run: cd ./burrows_wheeler/testing/gtest && ./TestTeamReferenceBurrowsWheeler

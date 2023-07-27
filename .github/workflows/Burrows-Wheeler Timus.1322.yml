@@ -1,0 +1,22 @@
+name: Burrows-Wheeler Transform Timus.1322 CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install
+      run: pip install orjson selenium webdriver-manager
+    - name: test-timus
+      env:
+        TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
+        TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
+      run: bash "./burrows_wheeler/testing/Timus.1322. Spy/test.sh"
