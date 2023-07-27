@@ -262,7 +262,7 @@ class TimusOnlineJudge(Judge):
             content = resp.content.decode('utf-8')
             if resp.ok and content.startswith('SUCCESS'):
                 submission_number = content[len('SUCCESS') + 2:]
-                eprint(f"Successfully submitted to Timus (problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name}). Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
+                eprint(f"Successfully submitted to Timus into problem https://acm.timus.ru/problem.aspx?space={problemset_name}&num={problem_name} . Link to the submission: https://acm.timus.ru/getsubmit.aspx/{submission_number}.cpp")
                 return submission_number
             wait_time = min((1 << i) * .2, 16)
             eprint(f"Unsuccessful attempt {i + 1}. Will try again in {wait_time} seconds")
