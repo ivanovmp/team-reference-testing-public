@@ -1,19 +1,17 @@
-namespace SuffixAutomaton {
-    const int ALPHABET = 26;
-    
-    class SuffixAutomaton {
-    public:
-        SuffixAutomaton(const vector <int> &s) {
+namespace suffix {
+    struct Automaton {
+        const int ALPHABET;
+        Automaton(const vector <int> &s, const int ALPHABET) : ALPHABET(ALPHABET), next_step(ALPHABET + 3) {
             int n = (int) s.size();
             int max_states = max(2 * n - 1, 5);
             len.resize(max_states, 0), suflink.resize(max_states, -1);
             for (int i = 0; i < ALPHABET; i++) next_step[i].resize(max_states, -1);
 
-            int root = 0; 
+            int root = 0;
             quant++;
 
             int cur = root;
-            for (int x : s) cur = add_symbol(cur, x);	
+            for (int x : s) cur = add_symbol(cur, x);
             last_vert = cur;
         }
 
@@ -30,7 +28,7 @@ namespace SuffixAutomaton {
 
             if (p == -1) {
                 suflink[cur] = 0;
-                return cur; 	
+                return cur;
             }
 
             int q = next_step[c][p];
@@ -52,10 +50,17 @@ namespace SuffixAutomaton {
             suflink[cur] = clone;
             return cur;
         }
+    vector<bool> get_terminal_states() const { // только если надо!
+        vector<bool> term(len.size());
+        for (int i = last_vert; i; i = suflink[i])
+            term[i] = true;
+        term[0] = true;
+        return term;
+    }
 
-    private:
+    // private:
         int quant = 0, last_vert = 0;
-        vector <int> len, suflink;
-        vector <int> next_step[ALPHABET + 3];
+        vector<int> len, suflink;
+        vector<vector<int>> next_step;
     };
 }

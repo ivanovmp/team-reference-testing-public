@@ -1,0 +1,22 @@
+name: Cycle shifts (Timus.1423) via suffix automaton CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: install
+      run: pip install orjson selenium webdriver-manager
+    - name: test-timus
+      env:
+        TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
+        TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
+      run: bash "./SuffixAutomaton/testing/Timus.1423. String Tale/test.sh"
