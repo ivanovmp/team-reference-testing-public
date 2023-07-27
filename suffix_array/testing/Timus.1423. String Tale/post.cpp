@@ -8,7 +8,7 @@ int main() {
     getline(cin, s);
     getline(cin, t);
     const string g = s + ' ' + t;
-    const vi suf = build_suffix_array(g, 256);
+    const vi suf = build_suffix_array<uint8_t>(g, 256);
     const vi lcp = build_lcp(g, suf);
 
     vi possible(n); {

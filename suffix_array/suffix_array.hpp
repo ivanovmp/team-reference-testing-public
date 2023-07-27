@@ -1,15 +1,16 @@
-vi build_suffix_array(const string& s, const int max_code = 128) { // Codes of all characters from 32 to 127, 0-indexing, 300ms for strings less than 4e5
-    const int n = s.size();
+template<class Char, class Iter> // if beg and en are string, then Char should be uint8_t
+vi build_suffix_array(Iter beg, Iter en, const int alphabet = 128) { // Codes of all characters from 32 to 127, 0-indexing, 300ms for strings less than 4e5
+    const int n = en - beg;
     vpii cur_array(n + 1), new_cur_array(n + 1);
-    vi cnt(max(n + 1, max_code)), ptr(max(n + 1, max_code)),  value(n + 1);
+    vi cnt(max(n + 1, alphabet)), ptr(max(n + 1, alphabet)), value(n + 1);
 
-    for (auto c : s) cnt[(uint8_t)c]++;
+    for (auto it = beg; it != en; ++it) cnt[(Char)*it]++;
     ptr[0] = 1, cur_array[0] = {n, 0};
-    for (int i = 1; i < max_code; i++) ptr[i] = ptr[i - 1] + cnt[i - 1];
-    for (int i = 0; i < n; i++) cur_array[ptr[(uint8_t)s[i]]++] = {i, (uint8_t)s[i]};
+    for (int i = 1; i < alphabet; i++) ptr[i] = ptr[i - 1] + cnt[i - 1];
+    for (int i = 0; i < n; i++) cur_array[ptr[(Char)beg[i]]++] = {i, (Char)beg[i]};
     for (int i = 1; i <= n; i++) {
         cur_array[i].second = cur_array[i - 1].second;
-        if (i == 1 || s[cur_array[i].first] != s[cur_array[i - 1].first]) cur_array[i].second++;
+        if (i == 1 || beg[cur_array[i].first] != beg[cur_array[i - 1].first]) cur_array[i].second++;
     }
 
     int length = 1;
@@ -45,9 +46,9 @@ vi build_suffix_array(const string& s, const int max_code = 128) { // Codes of a
     for (int i = 1; i < (int)cur_array.size(); i++) suffix_array.push_back(cur_array[i].first);
     return suffix_array;
 }
-
-vi build_lcp(const string& s, const vi& suffix_array) { // 0-indexing
-    int n = s.size(), ptr = 0;
+template<class Iter>
+vi build_lcp(Iter beg, Iter en, const vi& suffix_array) { // 0-indexing
+    int n = en - beg, ptr = 0;
     vi ans(n - 1), pos(n);
     for (int i = 0; i < n; i++) pos[suffix_array[i]] = i;
 
@@ -58,7 +59,7 @@ vi build_lcp(const string& s, const vi& suffix_array) { // 0-indexing
             continue;
         }
         else ptr = max(0, ptr - 1);
-        while (max(i, suffix_array[cur + 1]) + ptr < n && s[i + ptr] == s[suffix_array[cur + 1] + ptr]) ptr++;
+        while (max(i, suffix_array[cur + 1]) + ptr < n && beg[i + ptr] == beg[suffix_array[cur + 1] + ptr]) ptr++;
         ans[cur] = ptr;
     }
 
