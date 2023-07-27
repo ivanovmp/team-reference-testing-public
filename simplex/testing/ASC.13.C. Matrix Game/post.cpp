@@ -1,6 +1,6 @@
 int main() {
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
+    freopen("matrix.in", "r", stdin);
+    freopen("matrix.out", "w", stdout);
     int n;
     cin >> n;
     vvi v(n, vi(n));
@@ -42,7 +42,7 @@ int main() {
     vf ans;
     ld num_ans = simplex.solve(ans);
 
-    cout << fixed << setprecision(5) << num_ans - LB;
+    cout << fixed << setprecision(5) << num_ans - LB << '\n';
     for (int i = 0; i < n; ++i)
         cout << ans[i] << " \n"[i == n - 1];
 }
