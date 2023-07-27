@@ -99,7 +99,7 @@ class Judge:
     def login(self) -> None:
         pass
 
-    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str) -> str:
+    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str, language: str) -> str:
         pass
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str,
@@ -160,7 +160,14 @@ class Codeforces(Judge):
         else:
             return self.get_link(f"/{problemset_name}/status?my=on")
 
-    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str) -> str:
+
+    def get_language_code(self, language: str) -> str:
+        if language == "cpp":
+            return "54"
+        else:
+            raise Exception(f"Unknown {language=}")
+
+    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str, language: str) -> str:
         self.driver.get(self.get_problem_link(problemset_name, contest_name, problem_name))
         menu = self.driver.find_element(By.CLASS_NAME, "second-level-menu-list")
         links = menu.find_elements(By.XPATH, ".//li/a")
@@ -179,7 +186,7 @@ class Codeforces(Judge):
                     raise Exception("Unable to find the list of languages!")
         language_field.click()
         for our_language_field in language_field.find_elements(By.XPATH, ".//option"):
-            if our_language_field.get_attribute("value") == "54":
+            if our_language_field.get_attribute("value") == self.get_language_code(language):
                 break
         our_language_field.click()
 
@@ -238,7 +245,7 @@ class TimusOnlineJudge(Judge):
     def __init__(self, login_str: str, password: str) -> None:
         super().__init__(login_str, password)
 
-    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str) -> str:
+    def submit(self, problemset_name: str, contest_name: str, problem_name: str, submission_filename: str, language: str) -> str:
         eprint(f"Trying to submit problem {problem_name}, {problemset_name=}, {contest_name=}.")
         if not problemset_name:
             problemset_name = "1"
@@ -249,7 +256,7 @@ class TimusOnlineJudge(Judge):
                 "judge_id": self.login_str,
                 "space": problemset_name,
                 "num": problem_name,
-                "language": "cpp",
+                "language": language,
                 "source": code,
             })
             content = resp.content.decode('utf-8')
@@ -280,9 +287,9 @@ class TimusOnlineJudge(Judge):
         raise Exception(f"Couldn't test submission {submission_number} for problem {problem_name}: {resp.status_code=} ({resp.reason}), {content=}")
 
 
-def work(judge: Judge, problemset_name: str, contest_name: str, problem_name: str, filename: str):
+def work(judge: Judge, problemset_name: str, contest_name: str, problem_name: str, filename: str, language: str):
     judge.login()
-    submission_number = judge.submit(problemset_name, contest_name, problem_name, filename)
+    submission_number = judge.submit(problemset_name, contest_name, problem_name, filename, language)
     judge.finish()
     if submission_number is None:
         return {}
@@ -307,11 +314,12 @@ parser.add_argument("judge_name")
 parser.add_argument("problem_name")
 parser.add_argument("-c", "--contest", help="specify contest name", default="")
 parser.add_argument("-s", "--set", help="specify problemset name", default="")
+parser.add_argument("-l", "--language", help="specify language", default="cpp")
 parser.add_argument("-t", "--throw", help="throw if the verdict is not as expected", default="")
 
 args = parser.parse_args()
 judge = construct_judge(args.judge_name)
-result = work(judge, args.set, args.contest, args.problem_name, args.filename)
+result = work(judge, args.set, args.contest, args.problem_name, args.filename, args.language)
 print(orjson.dumps(result).decode("utf-8"))
 if args.throw and args.throw != result.verdict:
     raise Exception(f"Excepted verdict '{args.throw}', but found '{result.verdict}'")
