@@ -1,4 +1,4 @@
-name: Number of substrings (Timus.1590) via suffix array CI
+name: Number of substrings (Timus.1590) via suffix automaton CI
 
 on:
   push:
@@ -19,4 +19,4 @@ jobs:
       env:
         TIMUS_LOGIN: ${{ secrets.TIMUS_LOGIN }}
         TIMUS_PASSWORD: ${{ secrets.TIMUS_PASSWORD }}
-      run: bash "./suffix_array/testing/Timus.1590. Bacon’s Cipher/test.sh"
+      run: bash "./SuffixAutomaton/testing/Timus.1423. String Tale/test.sh"
