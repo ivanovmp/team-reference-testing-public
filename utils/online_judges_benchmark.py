@@ -174,6 +174,11 @@ class Codeforces(Judge):
         submit_link = links[1]
         eprint(f"Read the statement on page {self.driver.current_url}")
         submit_link.click()
+        better_submit_url = self.driver.current_url + "/" + problem_name
+        submit_link.click()
+        eprint(f"Went to submit tab: {self.driver.current_url}")
+        eprint(f"Actually, I will jump jump to {better_submit_url}")
+        self.driver.get(better_submit_url)
         eprint(f"Went to submit tab: {self.driver.current_url}")
         LANGUAGE_TRIES = 20
         for i in range(LANGUAGE_TRIES):
