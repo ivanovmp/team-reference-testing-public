@@ -38,7 +38,7 @@ int main() {
     C[n] = 1;
 
     // solve
-    Simplex<ld> simplex(A, B, C, 1e-6);
+    Simplex<ld> simplex(A, B, C, 1e-8);
     vf ans;
     ld num_ans = simplex.solve(ans);
 
