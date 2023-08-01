@@ -140,7 +140,7 @@ namespace FFT {
 
         // A[0] == 1, ans[0] = 0
         vi logarithm(vi A, const int n) {
-            A.resize(min<int>(A.size(), n));
+            A.resize(min<int>(A.size(), n)); if (n == 0) return A;
             A = prod(derivative(A), inverse(A, n - 1), n - 1);
             return integral(A);
         }
@@ -219,6 +219,37 @@ namespace FFT {
                 egf[i] = NT::prod(egf[i], fact, MOD);
             }
             return egf;
+        }
+        // A[0] == 0, B[0] == 0
+        vi euler_semitransform(const vi &A, const int n) {
+            vi B(n);
+            vi invs = inverses(n);
+            for (int k = 1; k < n; ++k)
+                for (int i = 1, j = k; j < n; ++i, j += k)
+                    B[j] = NT::sum(B[j], NT::prod(A[i], invs[k], MOD), MOD);
+            return B;
+        }
+        // A[0] == 0, B[0] == 1
+        vi euler_transform(const vi &A, const int n) {
+            return exponent(euler_semitransform(A, n), n);
+        }
+        // A[0] == 0, B[0] == 0
+        vi inverse_euler_semitransform(vi B, const int n) {
+            vi fact(n, 1), invs(n, 1);
+            for (int i = 2; i < n; ++i) fact[i] = NT::prod(i, fact[i - 1], MOD);
+            int ifact = NT::inv(fact[n - 1], MOD);
+            for (int i = n - 1; i >= 2; --i) {
+                invs[i] = NT::prod(ifact, fact[i - 1], MOD);
+                ifact = NT::prod(ifact, i, MOD);
+            }
+            for (int i = 1; i < n; ++i)
+                for (int k = 2, j = 2 * i; j < n; ++k, j += i)
+                    B[j] = NT::dif(B[j], NT::prod(B[i], invs[k], MOD), MOD);
+            return B;
+        }
+        // A[0] == 0, B[0] == 1
+        vi inverse_euler_transform(const vi &B, const int n) {
+            return inverse_euler_semitransform(logarithm(B, n), n);
         }
 
     private:
