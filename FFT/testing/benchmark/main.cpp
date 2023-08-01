@@ -193,8 +193,8 @@ std::function<long long()> generate_test(int n, const string type) {
 }
 
 int main() {
-    const int N = 23;
-    const int TESTS = 10;
+    const int N = 18;
+    const int MAX_TESTS = 30, TESTS = 800;
     vector<string> types = {
             "multiply_float",
             "multiply_double",
@@ -218,12 +218,16 @@ int main() {
             "euler_int",
             "inverse_euler_int",
     };
-    vector<vector<vector<long long>>> times(types.size(), vector<vector<long long>>(N, vector<long long>(TESTS)));
+    vector<vector<vector<long long>>> times(types.size(), vector<vector<long long>>(N));
     long long sum = 0;
     for (int test = 0; test < TESTS; ++test) {
         cerr << "Done " << test << " tests out of " << TESTS << '\n';
-        for (int n = 0; n < N; ++n) {
-            cerr << "\tDone " << n << " sizes out of " << N << '\n';
+        int curN;
+        for (curN = 0; curN < N; ++curN)
+            if (test >= MAX_TESTS - MAX_TESTS / 3 + (MAX_TESTS / 3 << (N - 1 - curN)))
+                break;
+        for (int n = 0; n < curN; ++n) {
+            cerr << "\tDone " << n << " sizes out of " << curN << '\n';
             for (int type_i = 0; type_i < types.size(); ++type_i) {
                 string type = types[type_i];
                 auto task = generate_test(n, type);
@@ -231,7 +235,7 @@ int main() {
                 long long ans = task();
                 auto ending_time = chrono::high_resolution_clock::now();
                 sum += ans;
-                times[type_i][n][test] = (ending_time - beginning_time).count();
+                times[type_i][n].push_back((ending_time - beginning_time).count());
             }
         }
     }
@@ -244,8 +248,8 @@ int main() {
         cout << "[";
         for (int n = 0; n < N; ++n) {
             cout << "[";
-            for (int test = 0; test < TESTS; ++test)
-                cout << times[type_i][n][test] << ",";
+            for (long long t : times[type_i][n])
+                cout << t << ",";
             cout << "],";
         }
         cout << "]";
