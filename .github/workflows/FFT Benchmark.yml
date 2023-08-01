@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  gtest:
+  benchmark:
 
     runs-on: ubuntu-latest
 
