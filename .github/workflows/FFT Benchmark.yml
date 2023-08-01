@@ -1,0 +1,21 @@
+name: Benchmark CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  gtest:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: cmake
+      run: cd ./FFT/testing/benchmark/ && cmake .
+    - name: gtest-make
+      run: cd ./FFT/testing/benchmark/ && make
+    - name: gtest
+      run: cd ./FFT/testing/benchmark/ && ./TestTeamReferenceFFTBenchmark

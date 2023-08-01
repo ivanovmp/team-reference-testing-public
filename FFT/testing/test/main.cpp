@@ -10,6 +10,10 @@
 
 FFT::NTT ntt;
 
+chrono::duration<long long, nano> expected_time_fft(ul n) {
+    return (n << n) * 220ns + 5000ns;
+};
+
 void NTTcorrectAnswersCheck(const vector<int>& a, const vector<int>& b) {
     const int TRIES = 10;
     const int steps = 32 - __builtin_clz(max<int>(1, a.size()) + max<int>(1, b.size()) - 2);
@@ -101,17 +105,13 @@ NTTCorrectAnswersTestMacro(19)
 NTTCorrectAnswersTestMacro(20)
 
 void NTTFastCheck(const int bits) {
-    const auto t = 220ns, s = 5000ns;
-    auto expected_time = [&](ul n) {
-        return (n << n) * t + s;
-    };
-    const ul T = 3.5s / expected_time(bits);
+    const ul T = 3.5s / expected_time_fft(bits);
 
     vector<pair<vi, vi>> datasets(T);
     for (int i = 0; i < T; ++i)
         datasets[i] = {gen_int_vector(1 << bits), gen_int_vector(1 << bits)};
 
-    ld_nano et = expected_time(bits);
+    ld_nano et = expected_time_fft(bits);
     vector<ld_nano> times;
     for (const auto& dataset : datasets) {
         auto start_time = chrono::high_resolution_clock::now();
@@ -278,19 +278,17 @@ ExpLogTestMacro(17)
 ExpLogTestMacro(18)
 ExpLogTestMacro(19)
 
-/*
- * This is an incorrect test. There is some "Euler transform" used here which is not implemented.
- *
+
 // see https://oeis.org/A000088 and https://oeis.org/A001349
 TEST(FPS, A000088_A001349) {
     const vi A000088 = {1, 1, 2, 4, 11, 34, 156, 1044, 12346, 274668, 12005168, 20753511, 380854347, 849549682, 209104826, 721826955, 509875705, 766808107, 374514196, 553750285};
     const vi A001349 = {0, 1, 1, 2, 6, 21, 112, 853, 11117, 261080, 11716571, 8456212, 347756584, 434613547, 901586973, 10249089, 650259133, 951293339, 356845798, 71060229};
-    const vi A000088_expected = ntt.OGF(ntt.exponent(ntt.EGF(A001349), A001349.size()));
-    const vi A001349_expected = ntt.OGF(ntt.logarithm(ntt.EGF(A000088), A000088.size()));
+    const vi A000088_expected = ntt.euler_transform(A001349, A001349.size());
+    const vi A001349_expected = ntt.inverse_euler_transform(A000088, A000088.size());
     ASSERT_EQ(A000088, A000088_expected);
     ASSERT_EQ(A001349, A001349_expected);
 }
-*/
+
 
 // see https://oeis.org/A006125 and https://oeis.org/A001187
 TEST(FPS, A006125_A001187) {
@@ -322,6 +320,10 @@ TEST(NTT, CorrectPowersTest) {
     ASSERT_EQ(1, NT::binpow(ntt.ROOT, 1 << ntt.n, ntt.MOD));
     ASSERT_NE(1, NT::binpow(ntt.ROOT, 1 << ntt.n - 1, ntt.MOD));
     ASSERT_EQ(ntt.MOD - 1, NT::binpow(ntt.imaginary_unit, 2, ntt.MOD));
+}
+
+TEST(NTT, Benchmark) {
+
 }
 
 int main(int argc, char** argv) {
