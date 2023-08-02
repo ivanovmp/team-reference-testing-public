@@ -95,77 +95,54 @@ std::function<long long()> generate_test(int n, const string type) {
             auto a = ntt.cos(f, 1 << n);
             return (long long)a[n];
         };
-    } else if (type == "arccos_int") {
-        vector<int> f = generate_int_vector<int>(1 << n);
-        f[0] = 1;
-        return [f, n]() {
-            //auto a = ntt.arccos(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
-        };
     } else if (type == "tg_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.tg(f, 1 << n);
-            //return (long long)a[n];
-            return 0;
+            auto a = ntt.tg(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "arctg_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.arctg(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.arctg(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "sh_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.sh(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.sh(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "arcsh_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.arcsh(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.arcsh(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "ch_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.ch(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
-        };
-    } else if (type == "arcch_int") {
-        vector<int> f = generate_int_vector<int>(1 << n);
-        f[0] = 1;
-        return [f, n]() {
-            //auto a = ntt.arcch(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.ch(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "th_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.th(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.th(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "arcth_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
         f[0] = 0;
         return [f, n]() {
-            //auto a = ntt.arcth(f, 1 << n);
-            //return (long long)a[n];
-            return 0ll;
+            auto a = ntt.arcth(f, 1 << n);
+            return (long long)a[n];
         };
     } else if (type == "inverse_int") {
         vector<int> f = generate_int_vector<int>(1 << n);
@@ -194,7 +171,7 @@ std::function<long long()> generate_test(int n, const string type) {
 
 int main() {
     const int N = 18;
-    const int MAX_TESTS = 30, TESTS = 200;
+    const int MAX_TESTS = 30, TESTS = 800;
     vector<string> types = {
             "multiply_float",
             "multiply_double",

@@ -202,6 +202,7 @@ namespace FFT {
         }
         // A[0] == 0, ans[0] == 0
         vi arctg(const vi &A, const int n) {
+            if (n <= 1) return vi(n);
             vi A2P1 = prod(A, A, n - 1); A2P1[0] = NT::sum(A2P1[0], 1, MOD);
             return integral(prod(derivative(A), inverse(A2P1, n - 1),n - 1));
         }
