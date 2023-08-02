@@ -13,12 +13,15 @@ from webdriver_manager.opera import OperaDriverManager
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
 
-from time import sleep
+from time import time, sleep
 import requests
 import orjson
+import string
 from pathlib import Path
 import argparse
 import sys
+import random
+import hashlib
 from sys import platform
 import os
 from dataclasses import dataclass
@@ -216,8 +219,18 @@ class Codeforces(Judge):
         self.driver.close()
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str, wait_time: float = 5.) -> SubmissionResult:
+        method = f"/contest.status?contestId={contest_name}&count=100&handle={self.login_str}"
+        simple_address = self.get_link(f"/api{method}")
+        key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
+        use_extended_address = key is not None and secret is not None
+        if use_extended_address:
+            salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+            encoded = f"{salt}{method}#{secret}"
+            apiSig = f"{salt}{hashlib.sha512(encoded.encode('utf-8')).hexdigest()}"
+            address = self.get_link(f"/api{method}&apiKey={key}&time={time()}&{apiSig=}")
+        else:
+            address = simple_address
         for i in range(20):
-            address = self.get_link(f"/api/contest.status?contestId={contest_name}&count=100&handle={self.login_str}")
             eprint(f"Trying to get verdict via {address}")
             r = requests.get(address)
             response = orjson.loads(r.text)

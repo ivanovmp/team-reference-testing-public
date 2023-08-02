@@ -19,6 +19,8 @@ jobs:
         env:
           CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
           CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+          CODEFORCES_API_KEY: ${{ secrets.CODEFORCES_API_KEY }}
+          CODEFORCES_API_SECRET: ${{ secrets.CODEFORCES_API_SECRET }}
         run: bash "./simplex/testing/Codeforces.Gym.104506/A. Very Simple Problem/test.sh"
 
   codeforcesB:
@@ -33,6 +35,8 @@ jobs:
         env:
           CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
           CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+          CODEFORCES_API_KEY: ${{ secrets.CODEFORCES_API_KEY }}
+          CODEFORCES_API_SECRET: ${{ secrets.CODEFORCES_API_SECRET }}
         run: bash "./simplex/testing/Codeforces.Gym.104506/B. Simple Problem/test.sh"
 
   codeforcesC:
@@ -47,6 +51,8 @@ jobs:
         env:
           CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
           CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+          CODEFORCES_API_KEY: ${{ secrets.CODEFORCES_API_KEY }}
+          CODEFORCES_API_SECRET: ${{ secrets.CODEFORCES_API_SECRET }}
         run: bash "./simplex/testing/Codeforces.Gym.104506/C. Maximum Flow/test.sh"
 
   codeforcesD:
@@ -61,4 +67,6 @@ jobs:
         env:
           CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
           CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+          CODEFORCES_API_KEY: ${{ secrets.CODEFORCES_API_KEY }}
+          CODEFORCES_API_SECRET: ${{ secrets.CODEFORCES_API_SECRET }}
         run: bash "./simplex/testing/Codeforces.Gym.104506/D. Assignment Problem/test.sh"
