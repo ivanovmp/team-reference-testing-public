@@ -21,9 +21,9 @@ int main() {
         cin >> x;
         C[var] = x;
     }
-    Simplex<db> simplex(A, B, C, 1e-8);
+    Simplex<db> simplex(A, B, C, 1e-13);
     vf ans; db ans_db = simplex.solve(ans);
-    cout << fixed << setprecision(5);
+    cout << fixed << setprecision(13);
     if (ans.empty())
         if (ans_db == numeric_limits<db>::infinity())
             cout << "Unbounded\n";

@@ -14,11 +14,11 @@ int main() {
         if (a != 0)
             A[m + a - 1][i] = 1;
         if (a == n - 1)
-            C[i] = -1;
+            --C[i];
         if (b != 0)
             A[m + b - 1][i] = -1;
         if (b == n - 1)
-            C[i] = 1;
+            ++C[i];
     }
     Simplex<db> simplex(A, B, C, 1e-11);
     vf ans; db ans_db = simplex.solve(ans);
