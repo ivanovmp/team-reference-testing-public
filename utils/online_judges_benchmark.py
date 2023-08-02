@@ -223,14 +223,15 @@ class Codeforces(Judge):
         simple_address = self.get_link(f"/api{method}")
         key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
         use_extended_address = key is not None and secret is not None
-        if use_extended_address:
-            salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-            encoded = f"{salt}{method}#{secret}"
-            apiSig = f"{salt}{hashlib.sha512(encoded.encode('utf-8')).hexdigest()}"
-            address = self.get_link(f"/api{method}&apiKey={key}&time={time()}&{apiSig=}")
-        else:
-            address = simple_address
         for i in range(20):
+            if use_extended_address:
+                salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+                extended_method = f"{method}&apiKey={key}&time={int(time())}"
+                encoded = f"{salt}{extended_method}#{secret}"
+                apiSig = f"{salt}{hashlib.sha512(encoded.encode('utf-8')).hexdigest()}"
+                address = self.get_link(f"/api{extended_method}&{apiSig=}")
+            else:
+                address = simple_address
             eprint(f"Trying to get verdict via {address}")
             r = requests.get(address)
             response = orjson.loads(r.text)
