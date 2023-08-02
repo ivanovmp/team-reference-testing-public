@@ -170,7 +170,7 @@ std::function<long long()> generate_test(int n, const string type) {
 }
 
 int main() {
-    const int N = 18;
+    const int N = 19;
     const int MAX_TESTS = 30, TESTS = 800;
     vector<string> types = {
             "multiply_float",
