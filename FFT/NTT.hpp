@@ -7,6 +7,7 @@ namespace FFT {
         const int size; // == 1 << n
         const int MOD = 998244353, G = 3;
         const int ROOT; // = 565042129 for n == 20;
+        const int imaginary_unit = 911660635; // i^2 = MOD - 1
 
         NTT(int n = 20) : n(n), size(1 << n), ROOT(NT::binpow(G, (MOD - 1) >> n, MOD)), revers(size), root(size, 1),
                 fftA(size), fftB(size) {
@@ -62,7 +63,6 @@ namespace FFT {
         vector<int> multiply(const vector<int> &A, const vector<int> &B, int step) {
             return multiply(A.begin(), A.end(), B.begin(), B.end(), step);
         }
-
         // returns a vector of size exactly n
         vi prod(const vi &A, const vi &B, const int n) {
             int as = min<int>(A.size(), n), bs = min<int>(B.size(), n);
@@ -70,7 +70,7 @@ namespace FFT {
             ans.resize(n);
             return ans;
         }
-
+        // returns a vector of size A.size() + B.size() - 1 or 0
         vi prod(const vi &A, const vi &B) {
             if (A.empty() || B.empty()) return {};
             return prod(A, B, A.size() + B.size() - 1);
@@ -93,7 +93,7 @@ namespace FFT {
                 else ans[i] = NT::dif(A[i], B[i], MOD);
             return ans;
         }
-
+        // A[0] != 0
         vi inverse(const vi &A, const int n) {
             vi a(1, A[0]);
             vi b(1, NT::inv(A[0], MOD));
@@ -128,7 +128,6 @@ namespace FFT {
             }
             return fact;
         }
-
         // ans[0] == 0
         vi integral(const vi &A) const {
             vi B(A.size() + 1);
@@ -137,14 +136,12 @@ namespace FFT {
                 B[i] = NT::prod(A[i - 1], invs[i], MOD);
             return B;
         }
-
         // A[0] == 1, ans[0] = 0
         vi logarithm(vi A, const int n) {
             A.resize(min<int>(A.size(), n)); if (n == 0) return A;
             A = prod(derivative(A), inverse(A, n - 1), n - 1);
             return integral(A);
         }
-
         // A[0] == 0, ans[0] == 1
         vi exponent(const vi &A, const int n) {
             vi a(1);
@@ -158,7 +155,6 @@ namespace FFT {
             }
             return b;
         }
-
         // A[0] == 1, ans[0] == 1, alpha is rational
         vi power(vi A, const int alpha, const int n) {
             A = logarithm(A, n);
@@ -167,8 +163,6 @@ namespace FFT {
             A = exponent(A, n);
             return A;
         }
-
-        const int imaginary_unit = 911660635;
         // A[0] == 0, ans[0] == 0
         vi sin(const vi &A, const int n) {
             static int MINUS_I_HALF = NT::prod(imaginary_unit, (MOD - 1) / 2, MOD);
@@ -181,7 +175,6 @@ namespace FFT {
             for (int &i : exp_1) i = NT::prod(i, MINUS_I_HALF, MOD);
             return exp_1;
         }
-
         // A[0] == 0, ans[0] == 1
         vi cos(const vi &A, const int n) {
             static int HALF = (MOD + 1) / 2;
@@ -194,13 +187,55 @@ namespace FFT {
             for (int &i : exp_1) i = NT::prod(i, HALF, MOD);
             return exp_1;
         }
-
+        // A[0] == 0, ans[0] == 0; tg(x) = 2i / (e^{2ix} + 1) - i
+        vi tg(vi A, const int n) {
+            const int TWO_I = NT::sum(imaginary_unit, imaginary_unit, MOD);
+            for (int &i : A) i = NT::prod(i, TWO_I, MOD);
+            A = exponent(A, n); A[0] = NT::sum(A[0], 1, MOD); A = inverse(A, n);
+            for (int &i : A) i = NT::prod(i, TWO_I, MOD);
+            A[0] = NT::dif(A[0], imaginary_unit, MOD); return A;
+        }
         // A[0] == 0, ans[0] == 0
         vi arcsin(const vi &A, const int n) {
             static int MINUS_HALF = (MOD - 1) / 2;
             return integral(prod(derivative(A), power(dif(vi(1, 1), prod(A, A, n - 1)), MINUS_HALF, n - 1), n - 1));
         }
-
+        // A[0] == 0, ans[0] == 0
+        vi arctg(const vi &A, const int n) {
+            vi A2P1 = prod(A, A, n - 1); A2P1[0] = NT::sum(A2P1[0], 1, MOD);
+            return integral(prod(derivative(A), inverse(A2P1, n - 1),n - 1));
+        }
+        // A[0] == 0, ans[0] == 0
+        vi sh(vi A, const int n) {
+            static int HALF = (MOD + 1) / 2;
+            A = exponent(A, n); A = dif(A, inverse(A, n));
+            for (int &i: A) i = NT::prod(i, HALF, MOD);
+            return A;
+        }
+        // A[0] == 0, ans[0] == 1
+        vi ch(vi A, const int n) {
+            static int HALF = (MOD + 1) / 2;
+            A = exponent(A, n); A = sum(A, inverse(A, n));
+            for (int &i: A) i = NT::prod(i, HALF, MOD);
+            return A;
+        }
+        // A[0] == 0, ans[0] == 0; 1 - 2 / (e^{2x} + 1)
+        vi th(vi A, const int n) {
+            A = sum(A, A); A = exponent(A, n);
+            A[0] = NT::sum(A[0], 1, MOD); A = inverse(A, n);
+            A = sum(A, A); A = dif(vi(1, 1), A);
+            return A;
+        }
+        // A[0] == 0, ans[0] == 0
+        vi arcsh(const vi &A, const int n) {
+            static int MINUS_HALF = (MOD - 1) / 2;
+            return integral(prod(derivative(A), power(sum(vi(1, 1), prod(A, A, n - 1)), MINUS_HALF, n - 1), n - 1));
+        }
+        // A[0] == 0, ans[0] == 0
+        vi arcth(const vi &A, const int n) {
+            vi A2P1 = prod(A, A, n - 1); A2P1 = dif(vi(1, 1),A2P1);
+            return integral(prod(derivative(A), inverse(A2P1, n - 1),n - 1));
+        }
         vi EGF(vi ogf) {
             int ifact = 1, n = ogf.size();
             for (int i = 2; i < n; ++i) ifact = NT::prod(ifact, i, MOD);

@@ -322,8 +322,69 @@ TEST(NTT, CorrectPowersTest) {
     ASSERT_EQ(ntt.MOD - 1, NT::binpow(ntt.imaginary_unit, 2, ntt.MOD));
 }
 
-TEST(NTT, Benchmark) {
-
+const int NTT_CORRECT_ANS_TEST_SIZE = 1500;
+TEST(NTTCorrectAns, CorrectAnsProd) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE);
+    vi b = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE);
+    ASSERT_EQ(ntt.prod(a, b), FFT::NaiveNTT::prod(a, b));
+}
+TEST(NTTCorrectAns, CorrectAnsInv) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); if (a[0] == 0) a[0] = 1;
+    vi ans(NTT_CORRECT_ANS_TEST_SIZE);
+    ans[0] = 1;
+    ASSERT_EQ(ans, ntt.prod(a, ntt.inverse(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsSin) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.sin(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::sin(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsCos) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.cos(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::cos(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsTg) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.sin(a, NTT_CORRECT_ANS_TEST_SIZE), ntt.prod(ntt.cos(a, NTT_CORRECT_ANS_TEST_SIZE), ntt.tg(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsSh) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.sh(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::sh(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsCh) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.ch(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::ch(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsTh) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.sh(a, NTT_CORRECT_ANS_TEST_SIZE), ntt.prod(ntt.ch(a, NTT_CORRECT_ANS_TEST_SIZE), ntt.th(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsLog) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 1;
+    ASSERT_EQ(ntt.logarithm(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::logarithm(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsExp) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.exponent(a, NTT_CORRECT_ANS_TEST_SIZE), FFT::NaiveNTT::exponent(a, NTT_CORRECT_ANS_TEST_SIZE));
+}
+TEST(NTTCorrectAns, CorrectAnsArcsin) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.arcsin(ntt.sin(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+    ASSERT_EQ(ntt.sin(ntt.arcsin(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+}
+TEST(NTTCorrectAns, CorrectAnsArctg) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.arctg(ntt.tg(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+    ASSERT_EQ(ntt.tg(ntt.arctg(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+}
+TEST(NTTCorrectAns, CorrectAnsArcsh) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.arcsh(ntt.sh(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+    ASSERT_EQ(ntt.sh(ntt.arcsh(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+}
+TEST(NTTCorrectAns, CorrectAnsArcth) {
+    vi a = gen_int_vector(NTT_CORRECT_ANS_TEST_SIZE); a[0] = 0;
+    ASSERT_EQ(ntt.arcth(ntt.th(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
+    ASSERT_EQ(ntt.th(ntt.arcth(a, NTT_CORRECT_ANS_TEST_SIZE), NTT_CORRECT_ANS_TEST_SIZE), a);
 }
 
 int main(int argc, char** argv) {
