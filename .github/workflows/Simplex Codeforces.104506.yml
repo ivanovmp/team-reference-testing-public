@@ -49,7 +49,7 @@ jobs:
           CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
         run: bash "./simplex/testing/Codeforces.Gym.104506/C. Maximum Flow/test.sh"
 
-  codeforcesA:
+  codeforcesD:
 
     runs-on: ubuntu-latest
 
