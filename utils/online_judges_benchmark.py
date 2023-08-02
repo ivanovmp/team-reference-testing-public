@@ -230,7 +230,7 @@ class Codeforces(Judge):
             return "?" + "&".join(f"{key}={value}" for key, value in arguments)
 
         def get_method(arguments) -> str:
-            return f"contest.status{combine_arguments(arguments)}"
+            return f"/contest.status{combine_arguments(arguments)}"
 
         key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
         use_extended_address = key is not None and secret is not None
