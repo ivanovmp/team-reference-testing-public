@@ -25,6 +25,7 @@ import hashlib
 from sys import platform
 import os
 from dataclasses import dataclass
+from copy import copy
 
 
 def eprint(*args, **kwargs):
@@ -219,19 +220,33 @@ class Codeforces(Judge):
         self.driver.close()
 
     def get_verdict(self, problemset_name: str, contest_name: str, problem_name: str, submission_number: str, wait_time: float = 5.) -> SubmissionResult:
-        method = f"/contest.status?contestId={contest_name}&count=100&handle={self.login_str}"
-        simple_address = self.get_link(f"/api{method}")
+        base_arguments = [
+            ("contestId", contest_name),
+            ("count", "100"),
+            ("handle", self.login_str)
+        ]
+
+        def combine_arguments(arguments) -> str:
+            return "?" + "&".join(f"{key}={value}" for key, value in arguments)
+
+        def get_method(arguments) -> str:
+            return f"contest.statue{combine_arguments(arguments)}"
+
         key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
         use_extended_address = key is not None and secret is not None
         for i in range(20):
+            address_arguments = copy(base_arguments)
             if use_extended_address:
                 salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-                extended_method = f"{method}&apiKey={key}&time={int(time())}"
+                address_arguments.append(("apiKey", key))
+                address_arguments.append(("time", int(time())))
+                address_arguments.sort()
+                extended_method = get_method(address_arguments)
                 encoded = f"{salt}{extended_method}#{secret}"
                 apiSig = f"{salt}{hashlib.sha512(encoded.encode('utf-8')).hexdigest()}"
-                address = self.get_link(f"/api{extended_method}&apiSig={apiSig}")
-            else:
-                address = simple_address
+                address_arguments.append(("apiSig", apiSig))
+
+            address = self.get_link(f"/api{get_method(address_arguments)}")
             eprint(f"Trying to get verdict via {address}")
             r = requests.get(address)
             response = orjson.loads(r.text)
