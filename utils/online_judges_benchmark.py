@@ -229,7 +229,7 @@ class Codeforces(Judge):
                 extended_method = f"{method}&apiKey={key}&time={int(time())}"
                 encoded = f"{salt}{extended_method}#{secret}"
                 apiSig = f"{salt}{hashlib.sha512(encoded.encode('utf-8')).hexdigest()}"
-                address = self.get_link(f"/api{extended_method}&{apiSig=}")
+                address = self.get_link(f"/api{extended_method}&apiSig={apiSig}")
             else:
                 address = simple_address
             eprint(f"Trying to get verdict via {address}")
