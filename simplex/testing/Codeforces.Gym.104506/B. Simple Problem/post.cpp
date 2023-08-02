@@ -25,7 +25,7 @@ int main() {
     vf ans; db ans_db = simplex.solve(ans);
     cout << fixed << setprecision(5);
     if (ans.empty())
-        if (ans == numeric_limits<db>::infinity())
+        if (ans_db == numeric_limits<db>::infinity())
             cout << "Unbounded\n";
         else
             cout << "No solution\n";
