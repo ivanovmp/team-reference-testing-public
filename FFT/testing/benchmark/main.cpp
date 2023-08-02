@@ -196,13 +196,13 @@ int main() {
     vector<vector<vector<long long>>> times(types.size(), vector<vector<long long>>(N));
     long long sum = 0;
     for (int test = 0; test < TESTS; ++test) {
-        cerr << "Done " << test << " tests out of " << TESTS << '\n';
+        //cerr << "Done " << test << " tests out of " << TESTS << '\n';
         int curN;
         for (curN = 0; curN < N; ++curN)
             if (test >= MAX_TESTS - MAX_TESTS / 3 + (MAX_TESTS / 3 << (N - 1 - curN)))
                 break;
         for (int n = 0; n < curN; ++n) {
-            cerr << "\tDone " << n << " sizes out of " << curN << '\n';
+            //cerr << "\tDone " << n << " sizes out of " << curN << '\n';
             for (int type_i = 0; type_i < types.size(); ++type_i) {
                 string type = types[type_i];
                 auto task = generate_test(n, type);
