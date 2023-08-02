@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  timus:
 
     runs-on: ubuntu-latest
 
