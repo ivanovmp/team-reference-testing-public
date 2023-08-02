@@ -20,7 +20,7 @@ int main() {
         if (b == n - 1)
             C[i] = 1;
     }
-    Simplex<db> simplex(A, B, C, 1e-4);
+    Simplex<db> simplex(A, B, C, 1e-11);
     vf ans; db ans_db = simplex.solve(ans);
     cout << int(round(ans_db)) << '\n';
     for (int i = 0; i < m; ++i)

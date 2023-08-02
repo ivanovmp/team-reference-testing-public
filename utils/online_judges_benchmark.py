@@ -230,7 +230,7 @@ class Codeforces(Judge):
             return "?" + "&".join(f"{key}={value}" for key, value in arguments)
 
         def get_method(arguments) -> str:
-            return f"contest.statue{combine_arguments(arguments)}"
+            return f"contest.status{combine_arguments(arguments)}"
 
         key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
         use_extended_address = key is not None and secret is not None
@@ -239,7 +239,7 @@ class Codeforces(Judge):
             if use_extended_address:
                 salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
                 address_arguments.append(("apiKey", key))
-                address_arguments.append(("time", int(time())))
+                address_arguments.append(("time", str(int(time()))))
                 address_arguments.sort()
                 extended_method = get_method(address_arguments)
                 encoded = f"{salt}{extended_method}#{secret}"
