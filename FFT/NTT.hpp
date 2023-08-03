@@ -169,8 +169,7 @@ namespace FFT {
             vi a = A; a.resize(min<int>(n, A.size()));
             for (int &i: a) i = NT::prod(i, imaginary_unit, MOD);
             vi exp_1 = exponent(a, n);
-            for (int &i : a) i = NT::dif(0, i, MOD);
-            vi exp_2 = exponent(a, n);
+            vi exp_2 = inverse(exp_1, n);
             exp_1 = dif(exp_1, exp_2);
             for (int &i : exp_1) i = NT::prod(i, MINUS_I_HALF, MOD);
             return exp_1;
@@ -181,8 +180,7 @@ namespace FFT {
             vi a = A; a.resize(min<int>(n, A.size()));
             for (int &i: a) i = NT::prod(i, imaginary_unit, MOD);
             vi exp_1 = exponent(a, n);
-            for (int &i : a) i = NT::dif(0, i, MOD);
-            vi exp_2 = exponent(a, n);
+            vi exp_2 = inverse(exp_1, n);
             exp_1 = sum(exp_1, exp_2);
             for (int &i : exp_1) i = NT::prod(i, HALF, MOD);
             return exp_1;
