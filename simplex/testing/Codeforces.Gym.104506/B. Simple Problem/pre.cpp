@@ -8,6 +8,6 @@
 using namespace std;
 using vi = vector<int>;
 using vvi = vector<vi>;
-using db = long double;
+using db = double;
 using vf = vector<db>;
 using vvf = vector<vf>;
