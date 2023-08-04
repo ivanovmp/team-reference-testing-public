@@ -8,20 +8,20 @@ int main() {
     vf C(VARS);
     for (int cond = 0; cond < CONDS; ++cond) {
         for (int var = 0; var < VARS; ++var) {
-            int x;
+            db x;
             cin >> x;
             A[cond][var] = x;
         }
-        int x;
+        db x;
         cin >> x;
         B[cond] = x;
     }
     for (int var = 0; var < VARS; ++var) {
-        int x;
+        db x;
         cin >> x;
         C[var] = x;
     }
-    Simplex<db> simplex(A, B, C, 1e-13);
+    Simplex<db> simplex(A, B, C, 1e-8);
     vf ans; db ans_db = simplex.solve(ans);
     cout << fixed << setprecision(13);
     if (ans.empty())
