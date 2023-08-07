@@ -89,9 +89,9 @@ jobs:
     - name: gtest-cmake
       run: cd cool_algorithm/testing/test/ && cmake .
     - name: gtest-make
-      run: cd cool_algorithm/testing/test && make
+      run: cd cool_algorithm/testing/test/ && make
     - name: gtest
-      run: cd cool_algorithm/testing/gtest && ./название_исполняемого_файла
+      run: cd cool_algorithm/testing/test/ && ./название_исполняемого_файла
 ```
   Последняя из этих команд упадёт (с ненулевым кодом возврата), если хотя бы один из тестов будет не пройден. Название исполняемого файла — это название CMake-цели, которое вы можете найти внизу в файле `CMakeLists.txt`. Например, в [этом примере](https://github.com/ivanovmp/team-reference-testing-public/tree/main/FFT/testing/test/CMakeLists.txt) цель называется `TestTeamReferenceFFT`. Вы можете, конечно, её переименовать.
 
