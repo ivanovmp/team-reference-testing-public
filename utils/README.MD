@@ -27,9 +27,9 @@ jobs:
       run: command_1
     - name: <название второго шага в свободной форме, но не содержащее пробелов>
       run: command_2
-.
-.
-.
+#
+#
+#
     - name: <название последнего шага в свободной форме, но не содержащее пробелов>
       run: command_c
   ```
@@ -54,9 +54,9 @@ jobs:
       run: command_1_1
     - name: step_2
       run: command_1_2
-.
-.
-.
+#
+#
+#
     - name: step_c_1
       run: command_1_c_1
 
@@ -70,14 +70,14 @@ jobs:
       run: command_2_1
     - name: step_2
       run: command_2_2
-.
-.
-.
+#
+#
+#
     - name: step_c_2
       run: command_2_c_2
-.
-.
-.
+#
+#
+#
   ```
 Далее опишем тестирование поподробнее.
 
