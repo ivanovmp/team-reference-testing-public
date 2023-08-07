@@ -202,3 +202,4 @@ cat <(echo -n "// ") <(date) "cool_algorithm/testing/test/pre.cpp" "cool_algorit
           CODEFORCES_API_SECRET: ${{ secrets.CODEFORCES_API_SECRET }}
       run: bash "cool_algorithm/testing/test/test.sh"
 ```
+Вот пример [скрипта для тестирования](https://github.com/ivanovmp/team-reference-testing-public/blob/main/simplex/testing/Codeforces.Gym.104506/A.%20Very%20Simple%20Problem/test.sh) и соответствующего [YAML-файла](https://github.com/ivanovmp/team-reference-testing-public/blob/main/.github/workflows/Simplex%20Codeforces.104506.yml) (обратите внимание, сразу несколько заданий объединены в один рабочий поток!).
