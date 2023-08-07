@@ -8,76 +8,76 @@
 4. Допустим, мы разрабатываем тест в папке `cool_algorithm/testing/test`. Основной принцип — сделать некую команду, которая, будучи запущена на файлах из этой папки, завершится успешно (код возврата 0), если алгоритм корректный и быстрый, и неуспешно (код возврата не 0) в противном случае. Кроме файлов из этой папки, команда может пользоваться заголовочными файлами (как `cool_algorithm/algo.hpp`, так и другими при надобности) и файлами в корневой папке `/utils`. Команда может быть не одна — в таком случае алгоритм должен быть рабочим тогда и только тогда, когда все эти команды завершаются успешно. Назовём эти команды `command_1`, ..., `command_c`.
 5. Создайте YAML-файл в папке `.github/workflows`, который будет отвечать за рабочий поток, тестирующий ваш алгоритм. Рабочий поток — это комплекс мероприятий, который будет проводиться при каждом изменении коммита в ветке master. Список всех рабочих потоков есть во вкладке [Actions](https://github.com/ivanovmp/team-reference-testing-public/actions). Типичный workflow-файл выглядит так:
   ```yaml
-name: <название рабочего потока в свободной форме>
+  name: <название рабочего потока в свободной форме>
+  
+  on:
+    push:
+      branches: [ "main" ]
+    pull_request:
+      branches: [ "main" ]
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  <название теста в свободной форме, но не содержащее пробелов>:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: <название первого шага в свободной форме, но не содержащее пробелов>
-      run: command_1
-    - name: <название второго шага в свободной форме, но не содержащее пробелов>
-      run: command_2
-#
-#
-#
-    - name: <название последнего шага в свободной форме, но не содержащее пробелов>
-      run: command_c
+  jobs:
+    <название теста в свободной форме, но не содержащее пробелов>:
+  
+      runs-on: ubuntu-latest
+  
+      steps:
+      - uses: actions/checkout@v3
+      - name: <название первого шага в свободной форме, но не содержащее пробелов>
+        run: command_1
+      - name: <название второго шага в свободной форме, но не содержащее пробелов>
+        run: command_2
+  #
+  #
+  #
+      - name: <название последнего шага в свободной форме, но не содержащее пробелов>
+        run: command_c
   ```
   Такой шаблон создаст рабочий поток, состоящий из одного теста. В один рабочий поток можно и объединить несколько тестов, для этого `jobs` должен состоять не из одного задания, а из нескольких:
   ```yaml
-name: Cool Algorithm CI
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-jobs:
-  test_1:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: step_1
-      run: command_1_1
-    - name: step_2
-      run: command_1_2
-#
-#
-#
-    - name: step_c_1
-      run: command_1_c_1
-
-  test_2:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    - name: step_1
-      run: command_2_1
-    - name: step_2
-      run: command_2_2
-#
-#
-#
-    - name: step_c_2
-      run: command_2_c_2
-#
-#
-#
+  name: Cool Algorithm CI
+  
+  on:
+    push:
+      branches: [ "main" ]
+    pull_request:
+      branches: [ "main" ]
+  
+  jobs:
+    test_1:
+  
+      runs-on: ubuntu-latest
+  
+      steps:
+      - uses: actions/checkout@v3
+      - name: step_1
+        run: command_1_1
+      - name: step_2
+        run: command_1_2
+  #
+  #
+  #
+      - name: step_c_1
+        run: command_1_c_1
+  
+    test_2:
+  
+      runs-on: ubuntu-latest
+  
+      steps:
+      - uses: actions/checkout@v3
+      - name: step_1
+        run: command_2_1
+      - name: step_2
+        run: command_2_2
+  #
+  #
+  #
+      - name: step_c_2
+        run: command_2_c_2
+  #
+  #
+  #
   ```
 Далее опишем тестирование поподробнее.
 
