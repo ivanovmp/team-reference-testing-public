@@ -86,6 +86,7 @@ jobs:
 2. Создайте файл `cool_algorithm/testing/test/main.cpp`. Сделайте в нём нужные `#include`-ы и alias-ы, затем напишите `#include "cool_algorithm/algo.hpp"` и, наконец, и напишите в нём один или несколько тестов, проверяющих работу вашего алгоритма. Простейший пример можно найти [тут](https://github.com/ivanovmp/team-reference-testing-public/blob/main/simplex/testing/gtest/main.cpp).
 3. Команды в YAML-файле рабочего потока должны быть следующими:
   ```yaml
+    - name: gtest-cmake
       run: cd cool_algorithm/testing/test/ && cmake .
     - name: gtest-make
       run: cd cool_algorithm/testing/test && make
