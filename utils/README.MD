@@ -172,7 +172,21 @@ cat <(echo -n "// ") <(date) "cool_algorithm/testing/test/pre.cpp" "cool_algorit
 
 У Codeforces нет API для отправки решений, поэтому бот имитирует реального человека: по-человечески открывает браузер, логинится, переходит на страницу задачи, отправляет решение и смотрит на страничке "статус" номер своей посылки, у которой потом узнаёт вердикт через API. Самое сложное тут — открыть браузер. Github Actions притворяется, что на инвокерах Ubuntu предустановлены Google Chrome и Mozilla Firefox. Это наглая ложь, ничего там не установлено. Текущее решение — когда машина запускается, удалить предустановленный Firefox и установить вместо него нормальный. За это отвечает скрипт [prepare-firefox.sh](https://github.com/ivanovmp/team-reference-testing-public/blob/main/utils/firefox/prepare-firefox.sh). Его надо будет вызвать в YAML-файле.
 
-Наконец, сабмиттер на Codeforces тоже нуждается в том, чтобы ему сообщили логин и пароль, а также ключ API. Таким образом, описание задачи выглядит так:
+Наконец, сабмиттер на Codeforces тоже нуждается в том, чтобы ему сообщили логин и пароль. Таким образом, описание задачи выглядит так:
+```yaml
+  codeforces:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install
+        run: sh ./utils/firefox/prepare-firefox.sh
+      - name: test-cf
+        env:
+          CODEFORCES_LOGIN: ${{ secrets.CODEFORCES_LOGIN }}
+          CODEFORCES_PASSWORD: ${{ secrets.CODEFORCES_PASSWORD }}
+      run: bash "cool_algorithm/testing/test/test.sh"
+```
+Если задача из приватной тренировки, то публичное API не даст посмотреть вердикт посылки. Тогда надо дополнительно сообщить сабмитерру ключ API:
 ```yaml
   codeforces:
     runs-on: ubuntu-latest
