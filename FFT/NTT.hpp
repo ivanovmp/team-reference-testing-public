@@ -4,13 +4,15 @@ namespace FFT {
     public:
         inline static const int MOD = 998244353, G = 3;
         inline static const int imaginary_unit = 911660635; // i^2 = MOD - 1
-        vi rt;
+        vi rt, art;
         int n() const {
             return rt.size() - 1;
         }
-        NTT(const int n = 20) : rt(n + 1) {
+        NTT(const int n = 20) : rt(n + 1), art(1 << n, 1) {
             rt[n] = NT::powmod(G, MOD >> n, MOD);
             for (int i = n - 1; i >= 0; --i) rt[i] = NT::prod(rt[i + 1], rt[i + 1], MOD);
+            art[1] = rt[n];
+            for (int i = 2; i < 1 << n; ++i) art[i] = NT::prod(art[i - 1], rt[n], MOD);
         }
         void fft(vector<int> &poly, int k) {
             poly.resize(1 << k);
@@ -21,16 +23,15 @@ namespace FFT {
                 if (i < r[i]) swap(poly[i], poly[r[i]]);
             }
             for (int l = 0; l < k; ++l) {
-                int pr = 1;
                 for (int i = 0; i < 1 << k; ++i) {
                     int j = i ^ 1 << l;
                     if (j <= i) {
-                        pr = 1;
+                        i += (1 << l) - 1;
                         continue;
                     }
+                    int pr = art[i << n() - l - 1 & (1 << n()) - 1];
                     int x = poly[i], y = NT::prod(poly[j], pr, MOD);
                     poly[i] = NT::sum(x, y, MOD); poly[j] = NT::dif(x, y, MOD);
-                    pr = NT::prod(pr, rt[l + 1], MOD);
                 }
             }
         }
