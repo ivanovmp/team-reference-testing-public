@@ -2,7 +2,7 @@
 #include <thread>
 
 #include "../../../utils/testing.hpp"
-#include "../../../number_theory/NT.hpp"
+#include "../../../number_theory/modulo.hpp"
 #include "../../FFT.hpp"
 #include "../../NTT.hpp"
 #include "naiveFFT.hpp"
