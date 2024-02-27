@@ -2,80 +2,76 @@
 namespace FFT {
     class NTT {
     public:
-        const int n; // <= 23
-        const int size; // == 1 << n
-        const int MOD = 998244353, G = 3;
-        const int ROOT; // = 565042129 for n == 20;
-        const int imaginary_unit = 911660635; // i^2 = MOD - 1
-
-        NTT(int n = 20) : n(n), size(1 << n), ROOT(NT::powmod(G, (MOD - 1) >> n, MOD)), revers(size), root(size, 1),
-                fftA(size), fftB(size) {
-            for (int i = 1; i < size; i++)
-                root[i] = (ll) root[i - 1] * ROOT % MOD;
+        inline static const int MOD = 998244353, G = 3;
+        inline static const int imaginary_unit = 911660635; // i^2 = MOD - 1
+        vi rt, art;
+        int n() const {
+            return rt.size() - 1;
         }
-
-        void fft(vector<int> &poly, int newN) {
-            revers[0] = 0;
-            for (int i = 1; i < (1 << newN); i++) {
-                if (i % 2 == 0) revers[i] = revers[i / 2] / 2;
-                else revers[i] = revers[i / 2] / 2 + (1 << (newN - 1));
-                if (revers[i] < i) swap(poly[revers[i]], poly[i]);
+        NTT(const int n = 20) : rt(n + 1), art(1 << n, 1) {
+            rt[n] = NT::powmod(G, MOD >> n, MOD);
+            for (int i = n - 1; i >= 0; --i) rt[i] = NT::prod(rt[i + 1], rt[i + 1], MOD);
+            art[1] = rt[n];
+            for (int i = 2; i < 1 << n; ++i) art[i] = NT::prod(art[i - 1], rt[n], MOD);
+        }
+        void fft(vector<int> &poly, int k) {
+            poly.resize(1 << k);
+            static vi r;
+            r.resize(1 << k);
+            for (int i = 1; i < 1 << k; ++i) {
+                r[i] = (r[i >> 1] >> 1) + ((i & 1) << k - 1);
+                if (i < r[i]) swap(poly[i], poly[r[i]]);
             }
-
-            for (int level = 1; level <= newN; level++)
-                for (int block = 0; block < (1 << (newN - level)); block++)
-                    for (int step = 0; step < (1 << (level - 1)); step++) {
-                        int num1 = (block << level) + step;
-                        int num2 = num1 + (1 << (level - 1));
-                        int valA = poly[num1];
-                        int valB = (ll) root[step << (n - level)] * poly[num2] % MOD;
-                        poly[num1] = (valA + valB) % MOD;
-                        poly[num2] = (valA - valB + MOD) % MOD;
+            for (int l = 0; l < k; ++l) {
+                for (int i = 0; i < 1 << k; ++i) {
+                    int j = i ^ 1 << l;
+                    if (j <= i) {
+                        i += (1 << l) - 1;
+                        continue;
                     }
+                    int pr = art[i << n() - l - 1 & (1 << n()) - 1];
+                    int x = poly[i], y = NT::prod(poly[j], pr, MOD);
+                    poly[i] = NT::sum(x, y, MOD); poly[j] = NT::dif(x, y, MOD);
+                }
+            }
         }
-
-        void rev_fft(vector<int> &poly, int step) {
-            fft(poly, step);
-            reverse(poly.begin() + 1, poly.begin() + (1 << step));
-            int inv_size = NT::powmod((1 << step), MOD - 2, MOD);
-            for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
+        void rev_fft(vector<int> &poly, int k) {
+            fft(poly, k);
+            reverse(poly.begin() + 1, poly.end());
+            int t = NT::inv(1 << k, MOD);
+            for (int& i : poly) i = NT::prod(i, t, MOD);
         }
-
+        vi multiply(vi A, vi B, int k) {
+            if (A.empty() || B.empty()) return vi(1 << k);
+            fft(A, k);
+            fft(B, k);
+            for (int i = 0; i < 1 << k; ++i)
+                A[i] = NT::prod(A[i], B[i], MOD);
+            rev_fft(A, k);
+            return A;
+        }
         template<class Iter>
-        vector<int> multiply(Iter Ab, Iter Ae, Iter Bb, Iter Be, int step) {
-            if (Ab == Ae || Bb == Be) return {};
-            fill(fftA.begin(), fftA.begin() + (1 << step), 0);
-            fill(fftB.begin(), fftB.begin() + (1 << step), 0);
-            for (auto it = Ab; it != Ae; ++it) fftA[it - Ab] = *it % MOD;
-            for (auto it = Bb; it != Be; ++it) fftB[it - Bb] = *it % MOD;
-
-            fft(fftA, step);
-            fft(fftB, step);
-            for (int i = 0; i < (1 << step); i++) fftA[i] = (ll) fftA[i] * fftB[i] % MOD;
-            rev_fft(fftA, step);
-
-            vector<int> result(1 << step);
-            for (int i = 0; i < (1 << step); i++) result[i] = fftA[i];
-            return result;
+        vi multiply(Iter Ab, Iter Ae, Iter Bb, Iter Be, int k) {
+            return multiply(vi(Ab, Ae), vi(Bb, Be), k);
         }
 
-        vector<int> multiply(const vector<int> &A, const vector<int> &B, int step) {
-            return multiply(A.begin(), A.end(), B.begin(), B.end(), step);
-        }
         // returns a vector of size exactly n
-        vi prod(const vi &A, const vi &B, const int n) {
-            int as = min<int>(A.size(), n), bs = min<int>(B.size(), n);
-            vi ans = multiply(A.begin(), A.begin() + as, B.begin(), B.begin() + bs, 32 - __builtin_clz(as + bs - 2));
+        vi prod(vi A, vi B, const int n) {
+            if (A.empty() || B.empty()) return vi(n);
+            const int as = min<int>(A.size(), n), bs = min<int>(B.size(), n);
+            A.resize(as); B.resize(bs);
+            vi ans = multiply(std::move(A), std::move(B), 32 - __builtin_clz(as + bs - 2));
             ans.resize(n);
             return ans;
         }
         // returns a vector of size A.size() + B.size() - 1 or 0
-        vi prod(const vi &A, const vi &B) {
+        vi prod(vi A, vi B) {
             if (A.empty() || B.empty()) return {};
-            return prod(A, B, A.size() + B.size() - 1);
+            const int n = A.size() + B.size() - 1;
+            return prod(std::move(A), std::move(B), n);
         }
 
-        vi sum(const vi &A, const vi &B) const {
+        static vi sum(const vi &A, const vi &B) {
             vi ans(max(A.size(), B.size()));
             for (int i = 0; i < ans.size(); ++i)
                 if (i >= A.size()) ans[i] = B[i];
@@ -84,7 +80,7 @@ namespace FFT {
             return ans;
         }
 
-        vi dif(const vi &A, const vi &B) const {
+        static vi dif(const vi &A, const vi &B) {
             vi ans(max(A.size(), B.size()));
             for (int i = 0; i < ans.size(); ++i)
                 if (i >= A.size()) ans[i] = NT::dif(0, B[i], MOD);
@@ -103,7 +99,7 @@ namespace FFT {
             return b;
         }
 
-        vi derivative(const vi &A) const {
+        static vi derivative(const vi &A) {
             if (A.size() <= 1) return {};
             vi B(A.size() - 1);
             for (int i = 1; i < A.size(); ++i)
@@ -111,14 +107,14 @@ namespace FFT {
             return B;
         }
 
-        vi factorials(const int n) const {
+        static vi factorials(const int n) {
             vi fact(n, 1);
             for (int i = 2; i < n; ++i)
                 fact[i] = NT::prod(i, fact[i - 1], MOD);
             return fact;
         }
 
-        vi inverses(const int n) const {
+        static vi inverses(const int n) {
             vi fact = factorials(n);
             int ifact = NT::inv(fact.back(), MOD);
             for (int i = n - 1; i >= 2; --i) {
@@ -128,7 +124,7 @@ namespace FFT {
             return fact;
         }
         // ans[0] == 0
-        vi integral(const vi &A) const {
+        static vi integral(const vi &A) {
             vi B(A.size() + 1);
             vi invs = inverses(B.size());
             for (int i = 1; i <= A.size(); ++i)
@@ -284,8 +280,5 @@ namespace FFT {
         vi inverse_euler_transform(const vi &B, const int n) {
             return inverse_euler_semitransform(logarithm(B, n), n);
         }
-
-    private:
-        vector<int> root, revers, fftA, fftB;
     };
 }
