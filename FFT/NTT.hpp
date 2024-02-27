@@ -1,5 +1,4 @@
 #pragma once
-
 namespace FFT {
     class NTT {
     public:
@@ -9,7 +8,7 @@ namespace FFT {
         const int ROOT; // = 565042129 for n == 20;
         const int imaginary_unit = 911660635; // i^2 = MOD - 1
 
-        NTT(int n = 20) : n(n), size(1 << n), ROOT(NT::binpow(G, (MOD - 1) >> n, MOD)), revers(size), root(size, 1),
+        NTT(int n = 20) : n(n), size(1 << n), ROOT(NT::powmod(G, (MOD - 1) >> n, MOD)), revers(size), root(size, 1),
                 fftA(size), fftB(size) {
             for (int i = 1; i < size; i++)
                 root[i] = (ll) root[i - 1] * ROOT % MOD;
@@ -38,7 +37,7 @@ namespace FFT {
         void rev_fft(vector<int> &poly, int step) {
             fft(poly, step);
             reverse(poly.begin() + 1, poly.begin() + (1 << step));
-            int inv_size = NT::binpow((1 << step), MOD - 2, MOD);
+            int inv_size = NT::powmod((1 << step), MOD - 2, MOD);
             for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
         }
 
