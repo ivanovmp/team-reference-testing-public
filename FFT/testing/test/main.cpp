@@ -200,7 +200,7 @@ TEST(FPS, EasyLogTest) {
         vi u = ntt.logarithm(v, S);
         vi expected_u(S);
         for (int i = 1; i < S; ++i)
-            expected_u[i] = NT::prod(NT::binpow<int>(NT::dif(0, a_1, ntt.MOD), i, ntt.MOD), NT::inv(NT::dif(0, i, ntt.MOD), ntt.MOD), ntt.MOD);
+            expected_u[i] = NT::prod(NT::powmod(NT::dif(0, a_1, ntt.MOD), i, ntt.MOD), NT::inv(NT::dif(0, i, ntt.MOD), ntt.MOD), ntt.MOD);
         ASSERT_EQ(u, expected_u);
     }
 }

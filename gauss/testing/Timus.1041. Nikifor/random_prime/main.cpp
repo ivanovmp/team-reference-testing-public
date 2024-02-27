@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include "../../../../utils/typedefs.hpp"
+#include "../../../../number_theory/modulo.hpp"
 #include "../../../../number_theory/NT.hpp"
 int main() {
     std::mt19937 rng;

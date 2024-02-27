@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "../../../utils/testing.hpp"
+#include "../../modulo.hpp"
 #include "../../NT.hpp"
 #include "naiveNT.hpp"
 
@@ -401,7 +402,10 @@ DeterministicAndRandomMillerRabinPrimality(63)
 DeterministicAndRandomMillerRabinPrimality(64)
 
 vu generate_square_isqrt_dataset(const ul L, const ul R, const ul n) {
-    vu ans = generate_random_dataset(NaiveNT::usqrt(L), NaiveNT::isqrt(R), n);
+    ul RL = NaiveNT::usqrt(L), RR = NaiveNT::isqrt(R);
+    if (RR < RL)
+        return generate_random_dataset(L, R, n);
+    vu ans = generate_random_dataset(RL, RR, n);
     for (ul i = 0; i < n; ++i)
         ans[i] *= ans[i];
     return ans;
@@ -582,6 +586,7 @@ void checkIsqrt(const int bits) {
        sd = generate_square_isqrt_dataset(L, R, T),
        md = generate_square_minus_one_isqrt_dataset(L, R, T),
        nd = generate_near_square_isqrt_dataset(L, R, T);
+    cerr << "[" << L << ", " << R << "]" << endl;
     check_isqrt_results(rd, "random dataset", et, bits);
     check_isqrt_results(sd, "square dataset", et, bits);
     check_isqrt_results(md, "square minus one dataset", et, bits);
