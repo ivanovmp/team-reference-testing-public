@@ -256,81 +256,6 @@ $
 
 \section{Коды}
 
-\subsection{Basic setup}
-
-1. Запустить все IDE.
-
-2. Сразу сделать файлы для всех задач.
-
-3. Для каждой задачи свой input file.
-
-4. Сделать template file, из него скопировать во все, не забыв поменять название input file.
-
-5. Сделать проект для тестинга времени работы.
-
-\begin{verbatim}
-// MCS: Andrew Sergeevich
-#ifdef ONPC
-    # define _GLIBCXX_DEBUG
-    #define deb(a) cerr << "========" << #a << " = " << a << endl;
-#else
-    #define deb(a)
-#endif
-#define sz(a) ((int)((a).size()))
-#include <bits/stdc++.h>
-#define char unsigned char
-#define pb push_back
-#define eb emplace_back
-#define ob pop_back
-#define mp make_pair
-//#define X first
-//#define Y second
-//#define x first
-//#define y second
-
-using namespace std;
-mt19937 rnd(239);
-//mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
-//mt19937_64 rnd(239);
-
-typedef long long ll;
-typedef long double ld;
-typedef pair<int, int> pii;
-typedef pair<ll, ll> pll;
-typedef vector<int> vi;
-typedef vector<ll> vl;
-
-int solve()
-{
-    int n;
-    if (!(cin >> n))
-        return 1;
-    
-    return 0;
-}
-
-int32_t main()
-{
-#ifdef ONPC
-    freopen("in.txt", "r", stdin);
-#endif
-    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
-    int TET = 1e9;
-    //cin >> TET;
-    for (int i = 1; i <= TET; i++)
-    {
-        if (solve())
-            break;
-        #ifdef ONPC
-            cout << "\n__________________________" << endl;
-        #endif
-    }
-#ifdef ONPC
-    cerr << endl << "finished in " << clock() * 1.0 / CLOCKS_PER_SEC << " sec" << endl;
-#endif
-}
-\end{verbatim}
-
 \subsection{Полезное}
 \begin{verbatim}
 Прагмы:
@@ -385,15 +310,6 @@ for (int s=m; ; s=(s-1)&m) {
 	... можно использовать s ...
 	if (s==0)  break;
 }
-\end{verbatim}
-
-\subsection{Python example}
-\begin{verbatim}
-def main():
-    n, k = list(map(int, input().split()))
-    for i in range(1, n):
-        if i in lst:
-            print(i ** 2)
 \end{verbatim}
 
 \subsection{Stress}
@@ -494,212 +410,210 @@ struct Bitset {
 
 \begin{verbatim}
 namespace FFT {
-    using db = double;
-    class FFT //NTT {
-    //double vs long double!!!
-    public:
-        const db PI = 4 * atan2(1, 1);
-        /*
-        const int n = 20;
-        const int size = (1 << n);
-        const int MOD = 998244353; //g = 3
-        const int ROOT = 565042129;
-       */
-        FFT(int _n) : size(1 << _n), n(_n) { //NTT()
-            revers.resize(size), root.resize(size);
-            fftA.resize(size), fftB.resize(size);
-            for (int i = 0; i < size / 2; i++) {
-                root[i] = Complex(cos(2 * PI * i / size), sin(2 * PI * i / size));
-                root[i + size / 2] = Complex(-root[i].real, -root[i].image);
-            }
-            /*
-            root[0] = 1;
-            for (int i = 1; i < size; i++)
-                root[i] = (ll) root[i - 1] * ROOT % MOD;
-            */
-        }
-        void fft(vector <Complex> &poly, int newN) { //Complex -> int
-            revers[0] = 0;
-            for (int i = 1; i < (1 << newN); i++) {
-                if (i % 2 == 0) revers[i] = revers[i / 2] / 2;
-                else revers[i] = revers[i / 2] / 2 + (1 << (newN - 1));
-                if (revers[i] < i) swap(poly[revers[i]], poly[i]);
-            }
-            for (int level = 1; level <= newN; level++)
-                for (int block = 0; block < (1 << (newN - level)); block++)
-                    for (int step = 0; step < (1 << (level - 1)); step++) {
-                        int num1 = (block << level) + step;
-                        int num2 = num1 + (1 << (level - 1));
-                        Complex valA = poly[num1];                             //Complex -> int
-                        Complex valB = root[step << (n - level)] * poly[num2]; //Complex -> int,(ll),%MOD
-                        poly[num1] = valA + valB; // % MOD
-                        poly[num2] = valA - valB; // % MOD
-                    }
-        }
-        void rev_fft(vector <Complex> &poly, int step) { //Complex -> int
-            fft(poly, step);
-            reverse(poly.begin() + 1, poly.begin() + (1 << step));
-            for (int i = 0; i < (1 << step); i++) poly[i] = poly[i] / (1 << step);
-            /*
-            int inv_size = binpow((1 << step), MOD - 2);
-            for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
-            */
-        }
-        vector <db> multiply(const vector <db> &A, const vector <db> &B, int step) { //db -> int
-            fill(fftA.begin(), fftA.begin() + (1 << step), 0);
-            fill(fftB.begin(), fftB.begin() + (1 << step), 0);
-            for (int i = 0; i < (int) A.size(); i++) fftA[i] = A[i]; // % MOD
-            for (int i = 0; i < (int) B.size(); i++) fftB[i] = B[i]; // % MOD
-            fft(fftA, step);
-            fft(fftB, step);
-            for (int i = 0; i < (1 << step); i++) fftA[i] = fftA[i] * fftB[i]; // (ll), % MOD
-            rev_fft(fftA, step);
-            vector <db> result(1 << step); //db -> int
-            for (int i = 0; i < (1 << step); i++) result[i] = fftA[i].real; // = fftA[i]
-            return result;
-        }
-    private:
-        int size, n;
-        vector <Complex> root;
-        vector <int> revers;
-        vector <Complex> fftA, fftB;
-        //vector <int> root, revers, fftA, fftB;
-    };
+using db = double;
+class FFT {//NTT
+//double vs long double!!!
+public:
+const db PI = 4 * atan2(1, 1);
+/*
+const int n = 20;
+const int size = (1 << n);
+const int MOD = 998244353; //g = 3
+const int ROOT = 565042129;
+*/
+FFT(int _n) : size(1 << _n), n(_n) { //NTT()
+    revers.resize(size), root.resize(size);
+    fftA.resize(size), fftB.resize(size);
+    for (int i = 0; i < size / 2; i++) {
+        root[i] = Complex(cos(2 * PI * i / size), sin(2 * PI * i / size));
+        root[i + size / 2] = Complex(-root[i].real, -root[i].image);
+    }
+    /*
+    root[0] = 1;
+    for (int i = 1; i < size; i++)
+        root[i] = (ll) root[i - 1] * ROOT % MOD;
+    */
 }
-\end{verbatim}
+void fft(vector <Complex> &poly, int newN) { //Complex -> int
+    revers[0] = 0;
+    for (int i = 1; i < (1 << newN); i++) {
+        if (i % 2 == 0) revers[i] = revers[i / 2] / 2;
+        else revers[i] = revers[i / 2] / 2 + (1 << (newN - 1));
+        if (revers[i] < i) swap(poly[revers[i]], poly[i]);
+    }
+    for (int level = 1; level <= newN; level++)
+        for (int block = 0; block < (1 << (newN - level)); block++)
+            for (int step = 0; step < (1 << (level - 1)); step++) {
+                int num1 = (block << level) + step;
+                int num2 = num1 + (1 << (level - 1));
+                Complex valA = poly[num1];                             //Complex -> int
+                Complex valB = root[step << (n - level)] * poly[num2]; //Complex -> int,(ll),%MOD
+                poly[num1] = valA + valB; // % MOD
+                poly[num2] = valA - valB; // % MOD
+            }
+}
+void rev_fft(vector <Complex> &poly, int step) { //Complex -> int
+    fft(poly, step);
+    reverse(poly.begin() + 1, poly.begin() + (1 << step));
+    for (int i = 0; i < (1 << step); i++) poly[i] = poly[i] / (1 << step);
+    /*
+    int inv_size = binpow((1 << step), MOD - 2);
+    for (int i = 0; i < (1 << step); i++) poly[i] = (ll) poly[i] * inv_size % MOD;
+    */
+}
+vector <db> multiply(const vector <db> &A, const vector <db> &B, int step) { //db -> int
+    fill(fftA.begin(), fftA.begin() + (1 << step), 0);
+    fill(fftB.begin(), fftB.begin() + (1 << step), 0);
+    for (int i = 0; i < (int) A.size(); i++) fftA[i] = A[i]; // % MOD
+    for (int i = 0; i < (int) B.size(); i++) fftB[i] = B[i]; // % MOD
+    fft(fftA, step);
+    fft(fftB, step);
+    for (int i = 0; i < (1 << step); i++) fftA[i] = fftA[i] * fftB[i]; // (ll), % MOD
+    rev_fft(fftA, step);
+    vector <db> result(1 << step); //db -> int
+    for (int i = 0; i < (1 << step); i++) result[i] = fftA[i].real; // = fftA[i]
+    return result;
+}
+private:
+int size, n;
+vector <Complex> root;
+vector <int> revers;
+vector <Complex> fftA, fftB;
+//vector <int> root, revers, fftA, fftB;
+};
+}\end{verbatim}
 
 \subsection{OR-XOR-AND-свёртки}
 
 \begin{verbatim}
 namespace Convolution {
-    class Convolution {
-        using Int = int;
-    public:
-        Convolution(int _n) : n(_n), size(1 << _n) {
-            helpA.resize(size), helpB.resize(size);
-        }
-        // OR  -- (1  0), REV -- ( 1 0)
-        //        (1  1)         (-1 1)
-        // AND -- (1  1), REV -- (1 -1)
-        //        (0  1)         (0  1)
-        // XOR -- (1  1), REV -- (1  1), /= size
-        //        (1 -1)         (1 -1)
-        vector <Int> convolution(const vector <Int> &A, const vector <Int> &B) {
-            for (int i = 0; i < size; i++) helpA[i] = A[i];
-            for (int i = 0; i < size; i++) helpB[i] = B[i];
-            transform(helpA);
-            transform(helpB);
-            for (int i = 0; i < size; i++) helpA[i] = helpA[i] * helpB[i];
-            rev_transform(helpA);
-            return helpA;
-        }
-    private:
-        vector <Int> helpA, helpB;
-        int n, size;
-    };
-}
-\end{verbatim}
+class Convolution {
+    using Int = int;
+public:
+    Convolution(int _n) : n(_n), size(1 << _n) {
+        helpA.resize(size), helpB.resize(size);
+    }
+    // OR  -- (1  0), REV -- ( 1 0)
+    //        (1  1)         (-1 1)
+    // AND -- (1  1), REV -- (1 -1)
+    //        (0  1)         (0  1)
+    // XOR -- (1  1), REV -- (1  1), /= size
+    //        (1 -1)         (1 -1)
+    vector <Int> convolution(const vector <Int> &A, const vector <Int> &B) {
+        for (int i = 0; i < size; i++) helpA[i] = A[i];
+        for (int i = 0; i < size; i++) helpB[i] = B[i];
+        transform(helpA);
+        transform(helpB);
+        for (int i = 0; i < size; i++) helpA[i] = helpA[i] * helpB[i];
+        rev_transform(helpA);
+        return helpA;
+    }
+private:
+    vector <Int> helpA, helpB;
+    int n, size;
+};
+}\end{verbatim}
 
 \subsection{Суффиксное дерево}
 
 \begin{verbatim}
 namespace SuffixTree {
 struct Position {
-    int vertex, shift; 	
+int vertex, shift;
 };
 const int ALPHABET = 26;
 class SuffixTree {
-public: 	 	
-    SuffixTree(const vector <int> &s) {
-        str = s;
-        int n = (int) str.size();
-        str_bounds.resize(2 * n, mp(0, 0)), suflink.resize(2 * n, -1), parent.resize(2 * n, mp(-1, -1));
-        for (int i = 0; i < ALPHABET; i++) next_step[i].resize(2 * n, -1);
-        quant++;
-        int root = 0;
-        str_bounds[root] = mp(0, -1);
-        suflink[root] = root;
-        Position cur = {root, 0};
-        for (int i = 0; i < n; i++) {
-            int symb = str[i];
-            bool do_move = true;
-            Position old = {-1, -1};
-            while (!can_move(cur, symb)) {
-                if (cur.vertex == root) do_move = false;
-                cur = create_edge(cur, symb, i, n - 1);
-                if (old.vertex != -1) suflink[old.vertex] = cur.vertex;
-                old = cur;
-                cur = jump_suflink(cur);
-            }
+public:
+SuffixTree(const vector <int> &s) {
+    str = s;
+    int n = (int) str.size();
+    str_bounds.resize(2 * n, mp(0, 0)), suflink.resize(2 * n, -1), parent.resize(2 * n, mp(-1, -1));
+    for (int i = 0; i < ALPHABET; i++) next_step[i].resize(2 * n, -1);
+    quant++;
+    int root = 0;
+    str_bounds[root] = mp(0, -1);
+    suflink[root] = root;
+    Position cur = {root, 0};
+    for (int i = 0; i < n; i++) {
+        int symb = str[i];
+        bool do_move = true;
+        Position old = {-1, -1};
+        while (!can_move(cur, symb)) {
+            if (cur.vertex == root) do_move = false;
+            cur = create_edge(cur, symb, i, n - 1);
             if (old.vertex != -1) suflink[old.vertex] = cur.vertex;
-            if (do_move) cur = move_next(cur, symb);
+            old = cur;
+            cur = jump_suflink(cur);
         }
+        if (old.vertex != -1) suflink[old.vertex] = cur.vertex;
+        if (do_move) cur = move_next(cur, symb);
     }
-    bool can_move(Position cur, int symb) const {
-        if (cur.shift == 0) return next_step[symb][cur.vertex] != -1;
-        else {
-            int next_symb = str[str_bounds[cur.vertex].x + cur.shift];
-            return next_symb == symb;
-        }
+}
+bool can_move(Position cur, int symb) const {
+    if (cur.shift == 0) return next_step[symb][cur.vertex] != -1;
+    else {
+        int next_symb = str[str_bounds[cur.vertex].x + cur.shift];
+        return next_symb == symb;
     }
-    Position create_edge(Position cur, int symb, int lef, int rig) {
-        if (cur.shift != 0) {
-            quant++;
-            int mid_vertex = quant - 1;
-            parent[mid_vertex] = parent[cur.vertex];
-            next_step[parent[mid_vertex].x][parent[mid_vertex].y] = mid_vertex;
-            int next_symb = str[str_bounds[cur.vertex].x + cur.shift];
-            parent[cur.vertex] = mp(next_symb, mid_vertex);
-            next_step[next_symb][mid_vertex] = cur.vertex;
-            str_bounds[mid_vertex] = mp(str_bounds[cur.vertex].x, str_bounds[cur.vertex].x + cur.shift - 1);
-            str_bounds[cur.vertex] = mp(str_bounds[cur.vertex].x + cur.shift, str_bounds[cur.vertex].y);
-            cur = {mid_vertex, 0};
-        }   
+}
+Position create_edge(Position cur, int symb, int lef, int rig) {
+    if (cur.shift != 0) {
         quant++;
-        int new_vertex = quant - 1;
-        next_step[symb][cur.vertex] = new_vertex;
-        parent[new_vertex] = mp(symb, cur.vertex);
-        str_bounds[new_vertex] = mp(lef, rig);
-        return cur;
+        int mid_vertex = quant - 1;
+        parent[mid_vertex] = parent[cur.vertex];
+        next_step[parent[mid_vertex].x][parent[mid_vertex].y] = mid_vertex;
+        int next_symb = str[str_bounds[cur.vertex].x + cur.shift];
+        parent[cur.vertex] = mp(next_symb, mid_vertex);
+        next_step[next_symb][mid_vertex] = cur.vertex;
+        str_bounds[mid_vertex] = mp(str_bounds[cur.vertex].x, str_bounds[cur.vertex].x + cur.shift - 1);
+        str_bounds[cur.vertex] = mp(str_bounds[cur.vertex].x + cur.shift, str_bounds[cur.vertex].y);
+        cur = {mid_vertex, 0};
     }
-    Position jump_suflink(Position cur) const {
-        int lef = 0, rig = 0;
-        if (cur.shift == 0) {
-            if (suflink[cur.vertex] != -1) return {suflink[cur.vertex], 0};
-            lef = str_bounds[cur.vertex].x, rig = str_bounds[cur.vertex].y;
+    quant++;
+    int new_vertex = quant - 1;
+    next_step[symb][cur.vertex] = new_vertex;
+    parent[new_vertex] = mp(symb, cur.vertex);
+    str_bounds[new_vertex] = mp(lef, rig);
+    return cur;
+}
+Position jump_suflink(Position cur) const {
+    int lef = 0, rig = 0;
+    if (cur.shift == 0) {
+        if (suflink[cur.vertex] != -1) return {suflink[cur.vertex], 0};
+        lef = str_bounds[cur.vertex].x, rig = str_bounds[cur.vertex].y;
+    } else {
+        lef = str_bounds[cur.vertex].x, rig = str_bounds[cur.vertex].x + cur.shift - 1;
+    }
+    if (parent[cur.vertex].y == 0) lef++;
+    Position new_cur = {suflink[parent[cur.vertex].y], 0};
+    int tek = lef;
+    while (tek <= rig) {
+        int next_vert = next_step[str[tek]][new_cur.vertex];
+        if (str_bounds[next_vert].y - str_bounds[next_vert].x + 1 <= rig - tek + 1) {
+            tek += str_bounds[next_vert].y - str_bounds[next_vert].x + 1;
+            new_cur = {next_vert, 0};
         } else {
-            lef = str_bounds[cur.vertex].x, rig = str_bounds[cur.vertex].x + cur.shift - 1; 	
-        }
-        if (parent[cur.vertex].y == 0) lef++;
-        Position new_cur = {suflink[parent[cur.vertex].y], 0};
-        int tek = lef;
-        while (tek <= rig) {
-            int next_vert = next_step[str[tek]][new_cur.vertex];
-            if (str_bounds[next_vert].y - str_bounds[next_vert].x + 1 <= rig - tek + 1) {
-                tek += str_bounds[next_vert].y - str_bounds[next_vert].x + 1;
-                new_cur = {next_vert, 0};
-            } else {
-                new_cur = {next_vert, rig - tek + 1};
-                tek = rig + 1;
-            }
-        }
-        return new_cur;
-    }
-    Position move_next(Position cur, int symb) const {
-        if (cur.shift == 0) {
-            int next_vert = next_step[symb][cur.vertex];
-            if (str_bounds[next_vert].y == str_bounds[next_vert].x) return {next_vert, 0};
-            else return {next_vert, 1};
-        } else {
-            if (str_bounds[cur.vertex].y - str_bounds[cur.vertex].x == cur.shift) return {cur.vertex, 0};
-            else return {cur.vertex, cur.shift + 1};
+            new_cur = {next_vert, rig - tek + 1};
+            tek = rig + 1;
         }
     }
+    return new_cur;
+}
+Position move_next(Position cur, int symb) const {
+    if (cur.shift == 0) {
+        int next_vert = next_step[symb][cur.vertex];
+        if (str_bounds[next_vert].y == str_bounds[next_vert].x) return {next_vert, 0};
+        else return {next_vert, 1};
+    } else {
+        if (str_bounds[cur.vertex].y - str_bounds[cur.vertex].x == cur.shift) return {cur.vertex, 0};
+        else return {cur.vertex, cur.shift + 1};
+    }
+}
 private:
-    int quant = 0;
-    vector <int> str;
-    vector <pair <int, int> > str_bounds, parent;
-    vector <int> next_step[ALPHABET + 3], suflink;                   
+int quant = 0;
+vector <int> str;
+vector <pair <int, int> > str_bounds, parent;
+vector <int> next_step[ALPHABET + 3], suflink;
 };
 }
 \end{verbatim}
@@ -708,56 +622,56 @@ private:
 
 \begin{verbatim}
 namespace SuffixAutomaton {
-    const int ALPHABET = 26;
-    class SuffixAutomaton {
-    public:
-        SuffixAutomaton(const vector <int> &s) {
-            int n = (int) s.size();
-            int max_states = max(2 * n - 1, 5);
-            len.resize(max_states, 0), suflink.resize(max_states, -1);
-            for (int i = 0; i < ALPHABET; i++) next_step[i].resize(max_states, -1);
-            int root = 0; 
-            quant++;
-            int cur = root;
-            for (int x : s) cur = add_symbol(cur, x);	
-            last_vert = cur;
-        }
-        int add_symbol(int last, int c) {
-            quant++;
-            int cur = quant - 1;
-            len[cur] = len[last] + 1;
-            int p = last;
-            while (p != -1 && next_step[c][p] == -1) {
-                next_step[c][p] = cur;
-                p = suflink[p];
-            }
-            if (p == -1) {
-                suflink[cur] = 0;
-                return cur; 	
-            }
-            int q = next_step[c][p];
-            if (len[q] == len[p] + 1) {
-                suflink[cur] = q;
-                return cur;
-            }
-            quant++;
-            int clone = quant - 1;
-            len[clone] = len[p] + 1;
-            while (p != -1 && next_step[c][p] == q) {
-                next_step[c][p] = clone;
-                p = suflink[p];
-            }
-            for (int i = 0; i < ALPHABET; i++) next_step[i][clone] = next_step[i][q];
-            suflink[clone] = suflink[q];
-            suflink[q] = clone;
-            suflink[cur] = clone;
-            return cur;
-        }
-    private:
-        int quant = 0, last_vert = 0;
-        vector <int> len, suflink;
-        vector <int> next_step[ALPHABET + 3];
-    };
+const int ALPHABET = 26;
+class SuffixAutomaton {
+public:
+SuffixAutomaton(const vector <int> &s) {
+    int n = (int) s.size();
+    int max_states = max(2 * n - 1, 5);
+    len.resize(max_states, 0), suflink.resize(max_states, -1);
+    for (int i = 0; i < ALPHABET; i++) next_step[i].resize(max_states, -1);
+    int root = 0;
+    quant++;
+    int cur = root;
+    for (int x : s) cur = add_symbol(cur, x);
+    last_vert = cur;
+}
+int add_symbol(int last, int c) {
+    quant++;
+    int cur = quant - 1;
+    len[cur] = len[last] + 1;
+    int p = last;
+    while (p != -1 && next_step[c][p] == -1) {
+        next_step[c][p] = cur;
+        p = suflink[p];
+    }
+    if (p == -1) {
+        suflink[cur] = 0;
+        return cur;
+    }
+    int q = next_step[c][p];
+    if (len[q] == len[p] + 1) {
+        suflink[cur] = q;
+        return cur;
+    }
+    quant++;
+    int clone = quant - 1;
+    len[clone] = len[p] + 1;
+    while (p != -1 && next_step[c][p] == q) {
+        next_step[c][p] = clone;
+        p = suflink[p];
+    }
+    for (int i = 0; i < ALPHABET; i++) next_step[i][clone] = next_step[i][q];
+    suflink[clone] = suflink[q];
+    suflink[q] = clone;
+    suflink[cur] = clone;
+    return cur;
+}
+private:
+int quant = 0, last_vert = 0;
+vector <int> len, suflink;
+vector <int> next_step[ALPHABET + 3];
+};
 }
 \end{verbatim}
 
@@ -765,169 +679,266 @@ namespace SuffixAutomaton {
 
 \begin{verbatim}
 namespace TwoChinese {
-    struct Edge {
-        int from, to, weight;
-    };
-    class TwoChinese {
-    public:
-        TwoChinese(int _n, const vector <Edge> &_edges, int _root) : n(_n), edges(_edges), root(_root) {
-            komp.resize(n), metka.resize(n), in_edges.resize(n);
-            delta.resize(n), parent.resize(n), used.resize(n), finish.resize(n);
-            for (int i = 0; i < n; i++) metka[i] = i, komp[i].pb(i);
-            for (int i = 0; i < (int) edges.size(); i++)
-                in_edges[edges[i].to].insert(mp(edges[i].weight, i));
-            finish[root] = true;
-            for (int vert = 0; vert < n; vert++)
-                if (!finish[vert]) {
-                    path.clear();
-                    build_path(metka[vert], -1);
-                }
-            for (int i = 0; i < n; i++)
-                if (i != root) total += edges[parent[i]].weight;
+struct Edge {
+int from, to, weight;
+};
+class TwoChinese {
+public:
+TwoChinese(int _n, const vector <Edge> &_edges, int _root) : n(_n), edges(_edges), root(_root) {
+    komp.resize(n), metka.resize(n), in_edges.resize(n);
+    delta.resize(n), parent.resize(n), used.resize(n), finish.resize(n);
+    for (int i = 0; i < n; i++) metka[i] = i, komp[i].pb(i);
+    for (int i = 0; i < (int) edges.size(); i++)
+        in_edges[edges[i].to].insert(mp(edges[i].weight, i));
+    finish[root] = true;
+    for (int vert = 0; vert < n; vert++)
+        if (!finish[vert]) {
+            path.clear();
+            build_path(metka[vert], -1);
         }
-        void build_path(int v, int last) {
-            path.pb(mp(v, last));
-            used[v] = true;
-            while (metka[edges[in_edges[v].begin()->y].from] == v)
-                in_edges[v].erase(in_edges[v].begin());
-            delta[v] = in_edges[v].begin()->x;
-            int num = in_edges[v].begin()->y;
-            int u = metka[edges[num].from];
-            if (finish[u]) {
-                for (const auto &[v0, nm] : path)
-                    for (int u0 : komp[v0])
-                        finish[u0] = true;
-                path.pb(mp(u, num));
-                for (int i = 0; i < (int) path.size() - 1; i++)
-                    parent[path[i].x] = path[i + 1].y;
-                return;	
-            }
-            if (!used[u]) {
-                build_path(u, num);
-                return;
-            }
-            vector <pair <int, int> > cycle;
-            int new_vert = u;
-            while (true) {
-                pair <int, int> A = path.back();
-                cycle.pb(A);
-                path.pop_back();
-                if ((int) komp[A.x].size() > (int) komp[new_vert].size()) new_vert = A.x;
-                if (A.x == u) break;
-            }
-            int old = cycle.back().y;
-            cycle.back().y = num;
-            vector <pair <int, int> > otkat;
-            for (const auto &[v0, nm] : cycle) {
-                if (v0 == new_vert) continue;
-                for (int u0 : komp[v0]) {
-                    otkat.pb(mp(u0, metka[u0]));
-                    metka[u0] = new_vert, komp[new_vert].pb(u0);
-                }
-                for (const auto &[w, nums] : in_edges[v0])
-                    in_edges[new_vert].insert(mp(w - delta[v0] + delta[new_vert], nums));
-            }
-            build_path(new_vert, old);
-            int need = parent[new_vert];
-            for (int i = 0; i < (int) cycle.size() - 1; i++)
-                parent[cycle[i + 1].x] = cycle[i].y;
-            parent[cycle[0].x] = cycle.back().y;
-            while (!otkat.empty()) {
-                pair <int, int> A = otkat.back();
-                otkat.pop_back();
-                metka[A.x] = A.y;
-            }
-            parent[metka[edges[need].to]] = need;
+    for (int i = 0; i < n; i++)
+        if (i != root) total += edges[parent[i]].weight;
+}
+void build_path(int v, int last) {
+    path.pb(mp(v, last));
+    used[v] = true;
+    while (metka[edges[in_edges[v].begin()->y].from] == v)
+        in_edges[v].erase(in_edges[v].begin());
+    delta[v] = in_edges[v].begin()->x;
+    int num = in_edges[v].begin()->y;
+    int u = metka[edges[num].from];
+    if (finish[u]) {
+        for (const auto &[v0, nm] : path)
+            for (int u0 : komp[v0])
+                finish[u0] = true;
+        path.pb(mp(u, num));
+        for (int i = 0; i < (int) path.size() - 1; i++)
+            parent[path[i].x] = path[i + 1].y;
+        return;
+    }
+    if (!used[u]) {
+        build_path(u, num);
+        return;
+    }
+    vector <pair <int, int> > cycle;
+    int new_vert = u;
+    while (true) {
+        pair <int, int> A = path.back();
+        cycle.pb(A);
+        path.pop_back();
+        if ((int) komp[A.x].size() > (int) komp[new_vert].size()) new_vert = A.x;
+        if (A.x == u) break;
+    }
+    int old = cycle.back().y;
+    cycle.back().y = num;
+    vector <pair <int, int> > otkat;
+    for (const auto &[v0, nm] : cycle) {
+        if (v0 == new_vert) continue;
+        for (int u0 : komp[v0]) {
+            otkat.pb(mp(u0, metka[u0]));
+            metka[u0] = new_vert, komp[new_vert].pb(u0);
         }
-    private:
-        int n;
-        vector <Edge> edges;
-        int root;
-        ll total = 0;
-        vector <int> parent, metka;
-        vector <vector <int> > komp;
-        vector <ll> delta;
-        vector <set <pair <ll, int> > > in_edges;
-        vector <bool> finish, used;
-        vector <pair <int, int> > path;
-    };
+        for (const auto &[w, nums] : in_edges[v0])
+            in_edges[new_vert].insert(mp(w - delta[v0] + delta[new_vert], nums));
+    }
+    build_path(new_vert, old);
+    int need = parent[new_vert];
+    for (int i = 0; i < (int) cycle.size() - 1; i++)
+        parent[cycle[i + 1].x] = cycle[i].y;
+    parent[cycle[0].x] = cycle.back().y;
+    while (!otkat.empty()) {
+        pair <int, int> A = otkat.back();
+        otkat.pop_back();
+        metka[A.x] = A.y;
+    }
+    parent[metka[edges[need].to]] = need;
+}
+private:
+int n;
+vector <Edge> edges;
+int root;
+ll total = 0;
+vector <int> parent, metka;
+vector <vector <int> > komp;
+vector <ll> delta;
+vector <set <pair <ll, int> > > in_edges;
+vector <bool> finish, used;
+vector <pair <int, int> > path;
+};
 }
 \end{verbatim}
 
 \subsection{Сжатие соцветий}
 \begin{verbatim}
 namespace GeneralMatching {
-    class GeneralMatching {
-    public:
-        GeneralMatching(int _n, const vector <vector <int> > &_g) : n(_n), g(_g) {
-            match.resize(n, -1), used.resize(n), base.resize(n), parent.resize(n), blossom.resize(n);
-            color.resize(n);
-            for (int v = 0; v < n; v++)
-                for (int u : g[v])
-                    if (match[v] == -1 && match[u] == -1)
-                        match[v] = u, match[u] = v;   
-            for (int v = 0; v < n; v++)
-                if (match[v] == -1)
-                    find_path(v);
-        }
-        void mark_path(int v, int b, int pr) {
-            while (base[v] != b) {
-                blossom[base[v]] = blossom[base[match[v]]] = true;
-                parent[v] = pr, pr = match[v], v = parent[pr];
-            }
-        }
-        int lca(int a, int b) {
-            color_count++;
-            for (a = base[a]; match[a] != -1; a = base[parent[match[a]]]) color[a] = color_count;
-            for (b = base[b]; a != b && color[b] != color_count; b = base[parent[match[b]]]);
-            return b;
-        }
-        void find_path(int root) {
-            for (int i = 0; i < n; i++)
-                base[i] = i, used[i] = 0, parent[i] = -1;
-            queue <int> qu;
-            qu.push(root), used[root] = true;
-            while (!qu.empty()) {
-                int v = qu.front();
-                qu.pop();
-                for (int u : g[v]) {
-                    if (base[u] == base[v] || match[v] == u) continue;
-                    if (u != root && match[u] == -1) {
-                        while (u != -1) {
-                            int old = match[v];
-                            match[u] = v, match[v] = u;
-                            u = old, v = parent[old];
-                        }
-                        return;
-                    }
-                    if (u == root || parent[match[u]] != -1) {
-                        int curbase = lca(v, u);
-                        for (int i = 0; i < n; i++) blossom[i] = false;
-                        mark_path(v, curbase, u);
-                        mark_path(u, curbase, v);
-                        for (int i = 0; i < n; i++)
-                            if (blossom[base[i]]) {
-                                base[i] = curbase;
-                                if (!used[i]) qu.push(i), used[i] = true;
-                            }
-                    } else if (parent[u] == -1) {
-                        parent[u] = v, u = match[u];
-                        qu.push(u), used[u] = true;
-                    }
+class GeneralMatching {
+public:
+GeneralMatching(int _n, const vector <vector <int> > &_g) : n(_n), g(_g) {
+    match.resize(n, -1), used.resize(n), base.resize(n), parent.resize(n), blossom.resize(n);
+    color.resize(n);
+    for (int v = 0; v < n; v++)
+        for (int u : g[v])
+            if (match[v] == -1 && match[u] == -1)
+                match[v] = u, match[u] = v;
+    for (int v = 0; v < n; v++)
+        if (match[v] == -1)
+            find_path(v);
+}
+void mark_path(int v, int b, int pr) {
+    while (base[v] != b) {
+        blossom[base[v]] = blossom[base[match[v]]] = true;
+        parent[v] = pr, pr = match[v], v = parent[pr];
+    }
+}
+int lca(int a, int b) {
+    color_count++;
+    for (a = base[a]; match[a] != -1; a = base[parent[match[a]]]) color[a] = color_count;
+    for (b = base[b]; a != b && color[b] != color_count; b = base[parent[match[b]]]);
+    return b;
+}
+void find_path(int root) {
+    for (int i = 0; i < n; i++)
+        base[i] = i, used[i] = 0, parent[i] = -1;
+    queue <int> qu;
+    qu.push(root), used[root] = true;
+    while (!qu.empty()) {
+        int v = qu.front();
+        qu.pop();
+        for (int u : g[v]) {
+            if (base[u] == base[v] || match[v] == u) continue;
+            if (u != root && match[u] == -1) {
+                while (u != -1) {
+                    int old = match[v];
+                    match[u] = v, match[v] = u;
+                    u = old, v = parent[old];
                 }
+                return;
+            }
+            if (u == root || parent[match[u]] != -1) {
+                int curbase = lca(v, u);
+                for (int i = 0; i < n; i++) blossom[i] = false;
+                mark_path(v, curbase, u);
+                mark_path(u, curbase, v);
+                for (int i = 0; i < n; i++)
+                    if (blossom[base[i]]) {
+                        base[i] = curbase;
+                        if (!used[i]) qu.push(i), used[i] = true;
+                    }
+            } else if (parent[u] == -1) {
+                parent[u] = v, u = match[u];
+                qu.push(u), used[u] = true;
             }
         }
-        vector <int> matching() const {
-            return match;
-        }   
-    private:
-        int n;
-        vector <vector <int> > g;
-        vector <int> match, base, parent;
-        vector <bool> used, blossom;
-        int color_count = 0;
-        vector <int> color;
-   };
+    }
+}
+vector <int> matching() const {
+    return match;
+}
+private:
+int n;
+vector <vector <int> > g;
+vector <int> match, base, parent;
+vector <bool> used, blossom;
+int color_count = 0;
+vector <int> color;
+};
+}
+\end{verbatim}
+
+\subsection{Дерево доминаторов}
+\begin{verbatim}
+namespace DominatorsTree {
+const int H = 20;
+class DominatorsTree {
+public:
+void dfs(int v) {
+    renum[v] = timer++;
+    revnum.pb(v);
+    for (int u : g[v])
+        if (renum[u] == -1) {
+            dfs(u);
+            sons[v].pb(u);
+        }
+    return;
+}
+int find_parent(int v) {
+    if (v == parent[v]) return v;
+    int p = parent[v];
+    parent[v] = find_parent(p);
+    min_sdom[v] = min(min_sdom[v], min_sdom[p]);
+    return parent[v];
+}
+int get_minimum(int v) {
+    find_parent(v);
+    return min_sdom[v];
+}
+void unions(int a, int b) {
+    parent[b] = a;
+    return;
+}
+void dfsik(int v, int pr) {
+    dv[0][v] = mp(pr, v);
+    for (int i = 1; i <= H; i++)
+        if (dv[i - 1][v].x != -1) {
+            dv[i][v].x = dv[i - 1][dv[i - 1][v].x].x;
+            int a = dv[i - 1][v].y;
+            int b = dv[i - 1][dv[i - 1][v].x].y;
+            if (sdom[a] > sdom[b]) swap(a, b);
+            dv[i][v].y = a;
+        }
+        else break;
+    if (pr != -1) {
+        int cur = v, mn = v;
+        for (int i = H; i >= 0; i--)
+            if (dv[i][cur].x != -1 && renum[dv[i][cur].x] >= sdom[v]) {
+                int a = dv[i][cur].y;
+                if (sdom[a] < sdom[mn]) mn = a;
+                cur = dv[i][cur].x;
+            }
+        if (sdom[v] == sdom[mn]) dom[v] = sdom[v];
+        else dom[v] = dom[mn];
+    }
+    for (int u : sons[v])
+        dfsik(u, v);
+    return;
+}
+DominatorsTree(int n, const vector <vector <int> > _g, int start) : g(_g) {
+    rev.resize(n), sons.resize(n);
+    renum.resize(n, -1), dom.resize(n, -1), sdom.resize(n, n);
+    for (int v = 0; v < n; v++)
+        for (int u : g[v])
+            rev[u].pb(v);
+    dfs(start);
+    parent.resize(n), min_sdom.resize(n);
+    for (int i = 0; i < n; i++) parent[i] = i;
+    for (int i = (int) revnum.size() - 1; i >= 0; i--) {
+        int v = revnum[i];
+        for (int u : rev[v]) {
+            if (renum[u] == -1 || u == v) continue;
+            if (renum[u] < i) sdom[v] = min(sdom[v], renum[u]);
+            else sdom[v] = min(sdom[v], get_minimum(u));
+        }
+        min_sdom[v] = sdom[v];
+        for (int u : sons[v])
+            unions(v, u);
+    }
+    sdom[start] = 0;
+    for (int i = 0; i <= H; i++) dv[i].resize(n);
+    dfsik(start, -1);
+    for (int i = 0; i < n; i++)
+        if (dom[i] != -1) dom[i] = revnum[dom[i]];
+}
+vector <int> dominator_tree() const {
+    return dom;
+}
+private:
+vector <vector <int> > g, rev, sons;
+vector <int> dom, sdom;
+vector <int> renum, revnum;
+int timer = 0;
+vector <int> parent, min_sdom;
+vector <pair <int, int> > dv[H + 2];
+};
 }
 \end{verbatim}
 
@@ -1243,53 +1254,6 @@ int main() {
 }
 \end{verbatim}
 
-\subsection{Гаусс}
-
-\begin{verbatim}
-int gauss (vector<vector<double>> a,
-           vector<double> & ans) {
-    int n = (int) a.size();
-    int m = (int) a[0].size() - 1;
-    vector<int> where (m, -1);
-    for (int col=0, row=0; col<m && row<n; ++col) {
-        int sel = row;
-        for (int i=row; i<n; ++i)
-            if (abs (a[i][col]) > abs (a[sel][col]))
-                sel = i;
-        if (abs (a[sel][col]) < EPS)
-            continue;
-        for (int i=col; i<=m; ++i)
-            swap (a[sel][i], a[row][i]);
-        where[col] = row;
-        for (int i=0; i<n; ++i)
-            if (i != row) {
-                double c = 
-                  a[i][col] / a[row][col];
-                for (int j=col; j<=m; ++j)
-                    a[i][j] -= a[row][j] * c;
-            }
-        ++row;
-    }
-    ans.assign (m, 0);
-    for (int i=0; i<m; ++i)
-        if (where[i] != -1)
-            ans[i] = 
-            a[where[i]][m] / a[where[i]][i];
-    for (int i=0; i<n; ++i) {
-        double sum = 0;
-        for (int j=0; j<m; ++j)
-            sum += ans[j] * a[i][j];
-        if (abs (sum - a[i][m]) > EPS)
-            return 0;
-    }
-    for (int i=0; i<m; ++i)
-        if (where[i] == -1)
-            return INF;
-    return 1;
-}
-
-\end{verbatim}
-
 \subsection{Обратный по любому модулю}
 
 \begin{verbatim}
@@ -1389,106 +1353,6 @@ for (int i=1; i<=n; ++i) {
         p[j0] = p[j1];
         j0 = j1;
     } while (j0);
-}
-\end{verbatim}
-
-\subsection{Алгоритм Манакера}
-
-\begin{verbatim}
-vector<int> man_nech(string s) {
-    vector<int> p(sz(s), 0);
-    int l = -1, r = -1;
-    for (int i = 0; i < sz(s); i++) {
-        if (i < r)
-            p[i] = min(r - i, p[l + r - i]);
-        while (i > p[i] && i + p[i] + 1 < sz(s) && 
-               s[i - p[i] - 1] == s[i + p[i] + 1])
-            p[i]++;
-        if (i + p[i] > r)
-            l = i - p[i], r = i + p[i];
-    }
-    return p;
-}
-
-vector<int> man_ch(string s) {
-    vector<int> p(sz(s), 0);
-    int l = -1, r = -1;
-    for (int i = 0; i < sz(s); i++) {
-        if (i < r)
-            p[i] = min(r - i, p[l + r - i - 1]);
-        while (i >= p[i] && i + p[i] + 1 < sz(s) && 
-               s[i - p[i]] == s[i + p[i] + 1])
-            p[i]++;
-        if (i + p[i] > r)
-            l = i - p[i] + 1, r = i + p[i];
-    }
-    return p;
-}\end{verbatim}
-
-\subsection{Суфмас}
-
-\begin{verbatim}
-const char C = 'a' - 1; 
-// before first letter // change
-const char maxchar = 'z'; // change
-vector<int> suffarray(string s) 
-// without $ at the end
-{
-    vector<int> p, c, pn, cn, cnt;
-    int n = (int)s.size();
-    c.assign(n, 0);
-    for (int i = 0; i < n; i++)
-        c[i] = s[i] - C;
-    for (int j = 0; j <= (maxchar - C); j++)
-        for (int i = 0; i < n; i++)
-            if (c[i] == j)
-                p.push_back(i);
-    int maxc = c[p.back()];
-    pn.resize(n);
-    for (int k = 0; (1 << k) <= 2 * n; k++) {
-        for (int i = 0; i < n; i++)
-            pn[i] = 
-            ((p[i] - (1 << k)) % n + n) % n;
-        cnt.assign(maxc + 3, 0);
-        for (int i = 0; i < n; i++)
-            cnt[c[i] + 1]++;
-        for (int i = 1; i <= maxc + 2; i++)
-            cnt[i] += cnt[i - 1];
-        for (int i = 0; i < n; i++)
-            p[cnt[c[pn[i]]]++] = pn[i];
-        cn.assign(n, 0);
-        cn[p[0]] = 1;
-        for (int i = 1; i < n; i++)
-            if (c[p[i]] == c[p[i - 1]] && 
-            c[(p[i] + (1 << k)) % n] == 
-            c[(p[i - 1] + (1 << k)) % n])
-                cn[p[i]] = cn[p[i - 1]];
-            else
-                cn[p[i]] = cn[p[i - 1]] + 1;
-        maxc = cn[p.back()];
-        c = cn;
-    }
-    return p;
-}
-vector<int> findlcp(string s, vector<int> p) {
-    vector<int> lcp, mem;
-    int n = (int)s.size();
-    mem.resize(n);
-    for (int i = 0; i < n; i++)
-        mem[p[i]] = i;
-    lcp.assign(n, 0);
-    for (int i = 0; i < n; i++) {
-        if (i)
-            lcp[mem[i]] = max(lcp[mem[i - 1]] - 1, 0);
-        if (mem[i] == n - 1)
-            continue;
-        while (max(i, p[mem[i] + 1]) + 
-               lcp[mem[i]] < n 
-               && s[i + lcp[mem[i]]] == 
-               s[p[mem[i] + 1] + lcp[mem[i]]])
-            lcp[mem[i]]++;
-    }
-    return lcp;
 }
 \end{verbatim}
 
