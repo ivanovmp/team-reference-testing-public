@@ -1137,58 +1137,69 @@ struct Flusher {
 
 \subsection{Пересечение полуплоскостей}
 \begin{verbatim}
-namespace hpi{
- const double eps = 1e-8;
- typedef pair<long double, long double> pi;
- bool z(long double x){ return fabs(x) < eps; }
- long double ccw(pi a, pi b, pi c){
-  long double dx1 = b.first - a.first;
-  long double dy1 = b.second - a.second;
-  long double dx2 = c.first - a.first;
-  long double dy2 = c.second - a.second;
-  return dx1 * dy2 - dy1 * dx2;
- }
- struct line{
-  long double a, b, c;
-  bool operator<(const line &l)const{
-   bool flag1 = pi(a, b) > pi(0, 0);
-   bool flag2 = pi(l.a, l.b) > pi(0, 0);
-   if(flag1 != flag2) return flag1 > flag2;
-   long double t = ccw(pi(0, 0), pi(a, b), pi(l.a, l.b));
-   return z(t) ? c * hypot(l.a, l.b) < l.c * hypot(a, b) : t > 0;
-  }
-  pi slope(){ return pi(a, b); }
- };
- 
- pi cross(line a, line b){
-  long double det = a.a * b.b - b.a * a.b;
-  return pi((a.c * b.b - a.b * b.c) / det, (a.a * b.c - a.c * b.a) / det);
- }
- bool bad(line a, line b, line c){
-  if(ccw(pi(0, 0), a.slope(), b.slope()) <= 0) return false;
-  pi crs = cross(a, b);
-  return crs.first * c.a + crs.second * c.b >= c.c;
- }
- bool solve(vector<line> v, vector<pi> &solution){ // ax + by <= c;
-  sort(v.begin(), v.end());
-  deque<line> dq;
-  for(auto &i : v){
-   if(!dq.empty() && z(ccw(pi(0, 0), dq.back().slope(), i.slope()))) continue;
-   while(dq.size() >= 2 && bad(dq[dq.size()-2], dq.back(), i)) dq.pop_back();
-   while(dq.size() >= 2 && bad(i, dq[0], dq[1])) dq.pop_front();
-   dq.push_back(i);
-  }
-  while(dq.size() > 2 && bad(dq[dq.size()-2], dq.back(), dq[0])) dq.pop_back();
-  while(dq.size() > 2 && bad(dq.back(), dq[0], dq[1])) dq.pop_front();
-  vector<pi> tmp;
-  for(int i=0; i<dq.size(); i++){
-   line cur = dq[i], nxt = dq[(i+1)%dq.size()];
-   if(ccw(pi(0, 0), cur.slope(), nxt.slope()) <= eps) return false;
-   tmp.push_back(cross(cur, nxt));
-  }
-  solution = tmp;
-  return true;
- }
+namespace Halfplane
+{
+// bounding box ~ MAXC^3
+const ll INF = (ll) 1e18;
+const ld EPS = 1e-9;
+struct Halfplane
+{
+    // Ax + By + C >= 0
+    int A, B;
+    ll C;
+    bool outside(pair <ld, ld> point) const {
+        return A * point.x + B * point.y + C < -EPS;
+    }
+    bool operator < (const Halfplane &other) const {
+        bool fl1 = (B > 0) || (B == 0 && A > 0);
+        bool fl2 = (other.B > 0) || (other.B == 0 && other.A > 0);
+        if (fl1 != fl2) return fl1;
+        ll v = vecs(mp(A, B), mp(other.A, other.B));
+        if (v != 0) return v > 0;
+        return 1.0 * C / sqrtl((ll) A * A + (ll) B * B) < 1.0 * other.C / sqrtl((ll) other.A * other.A + (ll) other.B * other.B);
+    }
+};
+pair <ld, ld> intersect(Halfplane L1, Halfplane L2) {
+    ll X = L2.B * L1.C - L1.B * L2.C;
+    ll Y = L1.A * L2.C - L2.A * L1.C;
+    ll Z = (ll) L2.A * L1.B - (ll) L1.A * L2.B;
+    return mp(1.0 * X / Z, 1.0 * Y / Z);
+}
+vector <pair <ld, ld> > intersection(const vector <Halfplane> &halfplanes) {
+    /*vector <Halfplane> bounding_box = {
+        {0, 1, INF},
+        {-1, 0, INF},
+        {0, -1, INF},
+        {1, 0, INF},
+    };*/
+    vector <Halfplane> hp = halfplanes;
+    //hp.insert(hp.end(), bounding_box.begin(), bounding_box.end());
+
+    sort(hp.begin(), hp.end());
+    deque <Halfplane> dq;
+    for (const Halfplane &h : hp) {
+        while ((int) dq.size() >= 2 && h.outside(intersect(dq.rbegin()[0], dq.rbegin()[1]))) dq.pop_back();
+        while ((int) dq.size() >= 2 && h.outside(intersect(dq[0], dq[1]))) dq.pop_front();
+        if (!dq.empty() && vecs(mp(h.A, h.B), mp(dq.back().A, dq.back().B)) == 0)
+        {
+            if (scal(mp(h.A, h.B), mp(dq.back().A, dq.back().B)) < 0) return {};
+            continue;
+        }
+        dq.pb(h);
+    }
+
+    while ((int) dq.size() > 2 && dq[0].outside(intersect(dq.rbegin()[0], dq.rbegin()[1]))) dq.pop_back();
+    while ((int) dq.size() > 2 && dq.back().outside(intersect(dq[0], dq[1]))) dq.pop_front();
+
+    if ((int) dq.size() < 3) return {};
+    vector <pair <ld, ld> > result((int) dq.size());
+    for (int i = 0; i < (int) dq.size(); i++) {
+        int nxt = (i + 1) % (int) dq.size();
+        if (vecs(mp(dq[i].A, dq[i].B), mp(dq[nxt].A, dq[nxt].B)) <= 0) return {};
+        result[i] = intersect(dq[i], dq[nxt]);
+    }
+    return result;
+}
 }
 \end{verbatim}
 
