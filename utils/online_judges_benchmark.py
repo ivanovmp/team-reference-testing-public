@@ -234,7 +234,7 @@ class Codeforces(Judge):
 
         key, secret = os.getenv('CODEFORCES_API_KEY', None), os.environ.get('CODEFORCES_API_SECRET', None)
         use_extended_address = key is not None and secret is not None
-        for i in range(20):
+        for i in range(40):
             address_arguments = copy(base_arguments)
             if use_extended_address:
                 salt = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
@@ -272,7 +272,7 @@ class Codeforces(Judge):
             eprint(f"Still testing, try again in {wait_time} second(s)...")
             sleep(wait_time)
             wait_time = max(1., 2 * wait_time)
-
+            wait_time = min(wait_time, 30. + random.random() * 10)
 
 class TimusOnlineJudge(Judge):
     def __init__(self, login_str: str, password: str) -> None:
